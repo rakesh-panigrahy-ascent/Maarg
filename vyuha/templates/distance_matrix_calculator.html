@@ -1,0 +1,63 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<div class='container'>
+    <br/>
+    <div class="row">
+        <div class='col-8'>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Unit Name</span>
+        <input type="text" class="form-control" id="unit_name" placeholder="Simba" aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+
+    <form enctype="multipart/form-data" method="POST" action="">
+    <div class="input-group mb-3">
+        <span class="input-group-text">State</span>
+        <select class="form-select form-select-sm" id="state" aria-label=".form-select-sm example">
+            <option selected>Select</option>
+            <option value="Maharasthra">Maharasthra</option>
+            <option value="Goa">Goa</option>
+            <option value="Assam">Assam</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Chandigarh">Chandigarh</option>
+        </select>
+    </div>
+      
+    <div class="mb-3">
+        <label for="formFile" class="form-label">Geo-Coordinate File</label>
+        <input class="form-control" type="file" id="coordinate_file">
+    </div>
+
+    <button type="button" class="btn btn-success" id='calculate_distance_btn'>Calculate Distance Matrix</button>
+</form>
+
+<!-- <div class="alert alert-warning alert-dismissible fade show" role="alert" id='msg_div'>
+    <p id='msg'>You should check in on some of those fields below.</p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div> -->
+</div>
+<div class="col-4">
+    <div class="form-group">
+        <label for="formFile" class="form-label">Log:</label>
+        <textarea class="form-control" id="log_text" rows="3" style='height: 300px;' disabled></textarea>
+    </div>
+</div>
+</div>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Output Files</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for file in output_files %}
+        <tr>
+        <th scope="row">{{forloop.counter}}</th>
+        <td><a href='download_distance_matrix_files?filename={{file}}'>{{file}}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock body %}
