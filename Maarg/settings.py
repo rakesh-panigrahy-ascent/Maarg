@@ -16,9 +16,15 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-OSM_DATA_DIR = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/data"
-OSM_CONFIG_JSON_PATH = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/conf/ors-config.json"
+PROD = False
 
+if PROD == True:
+    OSM_DATA_DIR = '/routeoptimization/osmfiles/'
+    OSM_CONFIG_JSON_PATH = '/routeoptimization/openrouteservice/docker/conf/ors-config.json'
+else:
+    OSM_DATA_DIR = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/data"
+    OSM_CONFIG_JSON_PATH = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/conf/ors-config.json"
+    
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -26,9 +32,7 @@ OSM_CONFIG_JSON_PATH = "D:/code/ascent/route optimization/Engines/ors/openroutes
 SECRET_KEY = 'django-insecure-$i30iqu@y_c51ei4ej@_slqk2lmt+6#0msdw(5h!5u(k^un1h0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-SERVER = False
-
-if SERVER == False:
+if PROD == False:
     DEBUG = True
 else:
     DEBUG = False
@@ -83,7 +87,7 @@ WSGI_APPLICATION = 'Maarg.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 
-if SERVER == True:
+if PROD == True:
     DATABASES = {
         'default': {
             #'ENGINE': 'django.db.backends.sqlite3',

@@ -33,7 +33,7 @@ def index(request):
 
 
 def start_ors(request):
-   if SERVER == True:
+   if PROD == True:
       result = start_container.delay()
    else:
       result = start_container()
@@ -42,7 +42,7 @@ def start_ors(request):
    return JsonResponse(resp)
 
 def stop_ors(request):
-   if SERVER == True:
+   if PROD == True:
       result = stop_container.delay()
    else:
       result = stop_container()
@@ -56,7 +56,7 @@ def start_clustering(request):
    print(asset_id)
    print(unit_name)
 
-   if SERVER == True:
+   if PROD == True:
       result = start_cluster_process.delay(unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 10)
    else:
       result = start_cluster_process(unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 10)
@@ -141,7 +141,7 @@ def calculate_distance(request):
    input_file = 'vyuha/distance_matrix/input_files/{}'.format(output_filename)
    df = pd.read_csv(input_file)
    df = df.to_json()
-   if SERVER == True:
+   if PROD == True:
       result = start_distance_matrix_calculation.delay(df, unit_name)
    else:
       result = start_distance_matrix_calculation(df, unit_name)
