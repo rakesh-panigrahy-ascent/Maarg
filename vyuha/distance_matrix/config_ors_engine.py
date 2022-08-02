@@ -1,11 +1,16 @@
 import os
 import json
 import subprocess
+from time import time
+from urllib import request
+from Maarg.settings import OSM_CONFIG_JSON_PATH, OSM_DATA_DIR
+import requests
+import time
 
 def change_osm_file(filename='odisha'):
     new_file = 'data/{}-latest.osm.pbf'.format(filename)
     
-    f_path = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/conf/ors-config.json"
+    f_path = OSM_CONFIG_JSON_PATH
     fin = open(f_path, "r")
     data = fin.read()
     fin.close()
@@ -19,7 +24,34 @@ def change_osm_file(filename='odisha'):
 def start_container(container_id='899da61832ec'):
     cmd = 'docker container start {}'.format(container_id)
     subprocess.run(cmd)
+    return None
 
 def stop_container(container_id='899da61832ec'):
     cmd = 'docker container stop {}'.format(container_id)
     subprocess.run(cmd)
+    return None
+
+def get_osm_file_list():
+    f_path = OSM_DATA_DIR
+    files = os.listdir(f_path)
+    files = [x for x in files if 'pbf' in x] 
+    return files
+
+def get_current_osm_file():
+    f_path = OSM_CONFIG_JSON_PATH
+    fin = open(f_path, "r")
+    data = fin.read()
+    fin.close()
+    ors_config = json.loads(data)
+    osm_file = ors_config['ors']['services']['routing']['sources'][0]
+    return osm_file
+
+
+def check_ors_status():
+    try:
+        call = requests.get('http://localhost:8080/ors/v2/health')
+        resp =  call.text
+        resp = json.loads(resp)
+        return resp['status']
+    except Exception as e:
+        return 'ORS Engine Down! Kindly start and try again !'

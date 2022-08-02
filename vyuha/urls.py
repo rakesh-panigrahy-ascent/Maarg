@@ -4,9 +4,13 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('hello', views.hello, name='hello'),
-    path('hello2', views.say_hello, name='say_hello'),
+    path('cluster', views.cluster, name='cluster'),
     path('calculate_distance', views.calculate_distance, name='calculate_distance'),
     path('get_distance_matrix_log', views.get_distance_matrix_log, name='get_distance_matrix_log'),
-    path('download_distance_matrix_files', views.download_distance_matrix_files, name='download_distance_matrix_files')
+    path('download_distance_matrix_files', views.download_distance_matrix_files, name='download_distance_matrix_files'),
+    path('start_ors', views.start_ors, name='start_ors'),
+    path('stop_ors', views.stop_ors, name='stop_ors'),
+    path('start_clustering', views.start_clustering, name='start_clustering'),
+    path('check_cluster_requirement', views.check_cluster_requirement, name='check_cluster_requirement'),
+    path('generate_sales_data', views.generate_sales_data, name='generate_sales_data')
 ]

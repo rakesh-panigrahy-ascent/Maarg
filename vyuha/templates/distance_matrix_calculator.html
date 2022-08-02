@@ -3,11 +3,21 @@
 {% block body %}
 <div class='container'>
     <br/>
+    <span class="badge bg-primary">ORS Engine: {{ ors_engine_status }}</span>
+    <span class="badge bg-primary">Current OSM in Use: {{ current_osm_file }}</span>
+    
+    <br/><br/>
+
     <div class="row">
         <div class='col-8'>
     <div class="input-group mb-3">
         <span class="input-group-text">Unit Name</span>
-        <input type="text" class="form-control" id="unit_name" placeholder="Simba" aria-label="Username" aria-describedby="basic-addon1">
+        <select class="form-select form-select-sm" id="unit_name" aria-label=".form-select-sm example">
+            <option selected>Select</option>
+            {% for distributor in distributors %}
+            <option value="{{distributor}}">{{distributor}}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <form enctype="multipart/form-data" method="POST" action="">
@@ -15,11 +25,9 @@
         <span class="input-group-text">State</span>
         <select class="form-select form-select-sm" id="state" aria-label=".form-select-sm example">
             <option selected>Select</option>
-            <option value="Maharasthra">Maharasthra</option>
-            <option value="Goa">Goa</option>
-            <option value="Assam">Assam</option>
-            <option value="Rajasthan">Rajasthan</option>
-            <option value="Chandigarh">Chandigarh</option>
+            {% for state_name in state_names %}
+            <option value="{{state_name}}">{{state_name}}</option>
+            {% endfor %}
         </select>
     </div>
       
@@ -29,6 +37,15 @@
     </div>
 
     <button type="button" class="btn btn-success" id='calculate_distance_btn'>Calculate Distance Matrix</button>
+
+    <button type="button" class="btn btn-success" id='start_ors'>
+        Start ORS Engine
+    </button>
+
+    <button type="button" class="btn btn-Danger" id='stop_ors'>
+        Stop ORS Engine
+    </button>
+
 </form>
 
 <!-- <div class="alert alert-warning alert-dismissible fade show" role="alert" id='msg_div'>

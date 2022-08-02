@@ -1,0 +1,6 @@
+Cluster: 0
+Sale Value Pass: 100.0%
+Distance Pass: 100.0%
+Avg Daily Sale: 0.0
+Avg Daily Distance: 0.0
+

@@ -16,6 +16,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+OSM_DATA_DIR = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/data"
+OSM_CONFIG_JSON_PATH = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/conf/ors-config.json"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -24,9 +26,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$i30iqu@y_c51ei4ej@_slqk2lmt+6#0msdw(5h!5u(k^un1h0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SERVER = False
 
-ALLOWED_HOSTS = []
+if SERVER == False:
+    DEBUG = True
+else:
+    DEBUG = False
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.150.0.24']
 
 
 # Application definition
@@ -75,13 +82,27 @@ WSGI_APPLICATION = 'Maarg.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
+
+if SERVER == True:
+    DATABASES = {
+        'default': {
+            #'ENGINE': 'django.db.backends.sqlite3',
+            #'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'maarg',
+            'USER': 'rakesh',
+            'PASSWORD': 'rakesh_admin',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
+    }
+else:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -126,6 +147,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 #added Manually
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static"
+# ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')

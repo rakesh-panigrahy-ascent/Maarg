@@ -23,8 +23,10 @@ class distance_matrix:
             'Content-Type': 'application/json; charset=utf-8'
         }
     
-    # @celery.task()
+
     def distance(self,df, output_file_name):
+        df = json.loads(df)
+        df = pd.DataFrame(df)
         logging.info(str(datetime.today()))
         output_file_name += '_distance_matrix.csv'
         distance_df = pd.DataFrame(columns=['from_customer_code','to_customer_code','distance'])

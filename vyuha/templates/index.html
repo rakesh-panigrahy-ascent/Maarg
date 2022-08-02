@@ -24,10 +24,10 @@
             <div class="collapse navbar-collapse" id="navbarScroll">
                 <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/vyuha">Distance Matrix</a>
+                        <a class="nav-link active" aria-current="page" href="/">Distance Matrix</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="hello2">Link</a>
+                        <a class="nav-link" href="cluster">Cluster</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
@@ -84,17 +84,129 @@ $(document).ready(function(){
             }
         });
 
+    $('#generate_sales_data').click(function(){
+        unit_asset_id = $('#unit_name_asset_id').val()
+        form_data.append('unit_asset_id', unit_asset_id)
+        $.ajax({
+            url: 'generate_sales_data',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: 'post',
+            success: function (response) {
+                alert('Sale Data Generated!')
+                $('#sales_data').text(response.sales_data)
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
+    })
+
+    $('#unit_name_asset_id').change(function(){
+        unit_asset_id = $('#unit_name_asset_id').val()
+        form_data.append('unit_asset_id', unit_asset_id)
+        $.ajax({
+            url: 'check_cluster_requirement',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: 'post',
+            success: function (response) { // display success response
+                $('#distance_matrix_file').text(response.distance_matrix)
+                $('#sales_data').text(response.sales_data)
+                //sales_data
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
+    });
+    
+    $('#start_clustering').click(function(){
+        unit_asset_id = $('#unit_name_asset_id').val()
+        form_data.append('unit_asset_id', unit_asset_id)
+        $.ajax({
+            url: 'start_clustering',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: 'post',
+            success: function (response) { // display success response
+                alert(response.data);
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
+    });
+
+    $('#start_ors').click(function(){
+        $.ajax({
+            url: 'start_ors', // point to server-side URL
+            dataType: 'json', // what to expect back from server
+            cache: false,
+            contentType: false,
+            processData: false,
+            //data: {'data': form_data, 'csrfmiddlewaretoken': csrf_token},
+            data: form_data,
+            type: 'post',
+            success: function (response) { // display success response
+                alert(response.data);
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
+    })
+
+    $('#stop_ors').click(function(){
+        $.ajax({
+            url: 'stop_ors', // point to server-side URL
+            dataType: 'json', // what to expect back from server
+            cache: false,
+            contentType: false,
+            processData: false,
+            //data: {'data': form_data, 'csrfmiddlewaretoken': csrf_token},
+            data: form_data,
+            type: 'post',
+            success: function (response) { // display success response
+                alert(response.data);
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
+    })
+
     $("#calculate_distance_btn").click(function(){
         var form_data = new FormData();
         var ins = document.getElementById('coordinate_file').files.length;
         var unitname = $('#unit_name').val()
         var state = $('#state').val()
 
-        // if(ins == 0) {
-        //     $('#msg').html('<span style="color:red">Select at least one file</span>');
-        //     return;
-        // }
-					
+        if (unit_name == 'Select'){
+            alert('Kindly select unit name !')
+            return false
+        }
+
+        if (state == 'Select'){
+            alert('Kindly select the state !')
+            return false
+        }
+
+        file_count = document.getElementById('coordinate_file').files.length
+        if (file_count < 1){
+            alert('Kindly upload the geo coordinate file !')
+            return false
+        }
+
         for (var x = 0; x < ins; x++) {
             form_data.append("file", document.getElementById('coordinate_file').files[x]);
         }

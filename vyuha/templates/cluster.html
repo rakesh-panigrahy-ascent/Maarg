@@ -1,0 +1,57 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<div class='container'>
+    <br/>
+    <span class="badge bg-primary">Distance Matrix File: <p id='distance_matrix_file'>Not Available</p></span>
+    <span class="badge bg-primary">Sales Data File: <p id='sales_data'>Not Available</p></span>
+
+    <br/><br/>
+
+    <div class="row">
+        <div class='col-8'>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Unit Name</span>
+        <select class="form-select form-select-sm" id="unit_name_asset_id" aria-label=".form-select-sm example">
+            <option selected>Select</option>
+            {% for distributor in distributors %}
+            <option value="{{distributor}}">{{distributor}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+
+
+    <button type="button" class="btn btn-success" id='start_clustering'>Start Clutering</button>
+    <button type="button" class="btn btn-success" id='generate_sales_data'>Generate Sales Data</button>
+
+<!-- <div class="alert alert-warning alert-dismissible fade show" role="alert" id='msg_div'>
+    <p id='msg'>You should check in on some of those fields below.</p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div> -->
+</div>
+<div class="col-4">
+    <div class="form-group">
+        <label for="formFile" class="form-label">Log:</label>
+        <textarea class="form-control" id="log_text" rows="3" style='height: 300px;' disabled></textarea>
+    </div>
+</div>
+</div>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Output Files</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for file in output_files %}
+        <tr>
+        <th scope="row">{{forloop.counter}}</th>
+        <td><a href='download_distance_matrix_files?filename={{file}}'>{{file}}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock body %}
