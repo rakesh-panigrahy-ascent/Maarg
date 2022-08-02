@@ -19,8 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PROD = False
 
 if PROD == True:
-    OSM_DATA_DIR = '/routeoptimization/osmfiles/'
-    OSM_CONFIG_JSON_PATH = '/routeoptimization/openrouteservice/docker/conf/ors-config.json'
+    OSM_DATA_DIR = '/home/bender/routeoptimization/osmfiles/'
+    OSM_CONFIG_JSON_PATH = '/home/bender/routeoptimization/openrouteservice/docker/conf/ors-config.json'
 else:
     OSM_DATA_DIR = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/data"
     OSM_CONFIG_JSON_PATH = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/conf/ors-config.json"
