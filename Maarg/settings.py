@@ -16,7 +16,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-PROD = False
+PROD = True
 
 if PROD == True:
     OSM_DATA_DIR = '/home/bender/routeoptimization/osmfiles/'
@@ -37,7 +37,7 @@ SECRET_KEY = 'django-insecure-$i30iqu@y_c51ei4ej@_slqk2lmt+6#0msdw(5h!5u(k^un1h0
 if PROD == False:
     DEBUG = True
 else:
-    DEBUG = False
+    DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.150.0.24']
 

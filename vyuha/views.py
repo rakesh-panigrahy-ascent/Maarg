@@ -34,7 +34,7 @@ def index(request):
 
 def start_ors(request):
    if PROD == True:
-      result = start_container.delay()
+      result = start_container()
    else:
       result = start_container()
 
@@ -43,7 +43,7 @@ def start_ors(request):
 
 def stop_ors(request):
    if PROD == True:
-      result = stop_container.delay()
+      result = stop_container()
    else:
       result = stop_container()
       
