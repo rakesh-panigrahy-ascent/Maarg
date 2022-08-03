@@ -21,10 +21,12 @@ PROD = False
 if PROD == True:
     OSM_DATA_DIR = '/home/bender/routeoptimization/osmfiles/'
     OSM_CONFIG_JSON_PATH = '/home/bender/routeoptimization/openrouteservice/docker/conf/ors-config.json'
+    CONTAINER_ID = '4e39a50b616a'
 else:
     OSM_DATA_DIR = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/data"
     OSM_CONFIG_JSON_PATH = "D:/code/ascent/route optimization/Engines/ors/openrouteservice/docker/conf/ors-config.json"
-    
+    CONTAINER_ID = '899da61832ec'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 

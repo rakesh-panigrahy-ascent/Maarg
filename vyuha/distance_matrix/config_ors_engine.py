@@ -3,7 +3,7 @@ import json
 import subprocess
 from time import time
 from urllib import request
-from Maarg.settings import OSM_CONFIG_JSON_PATH, OSM_DATA_DIR
+from Maarg.settings import OSM_CONFIG_JSON_PATH, OSM_DATA_DIR, CONTAINER_ID
 import requests
 import time
 
@@ -21,13 +21,13 @@ def change_osm_file(filename='odisha'):
     fout.write(json.dumps(ors_config))
     fout.close()
 
-def start_container(container_id='899da61832ec'):
-    cmd = 'docker container start {}'.format(container_id)
+def start_container():
+    cmd = 'docker container start {}'.format(CONTAINER_ID)
     subprocess.run(cmd)
     return None
 
-def stop_container(container_id='899da61832ec'):
-    cmd = 'docker container stop {}'.format(container_id)
+def stop_container():
+    cmd = 'docker container stop {}'.format(CONTAINER_ID)
     subprocess.run(cmd)
     return None
 
