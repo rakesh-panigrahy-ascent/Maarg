@@ -21,5 +21,7 @@ def start_distance_matrix_calculation(df, unit_name):
 @app.task
 def start_cluster_process(unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 10):
     cl = Cluster(unit_name, sales_value_benchmark, distance_benchmark, max_clusters)
+    print('Clustering Started')
     cl.start()
     cl.export_summary()
+    cl.export_reports()

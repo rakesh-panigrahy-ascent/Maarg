@@ -16,7 +16,9 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-PROD = True
+CLUSTER_SHEET_ID = '1ql4M3e2wzf9qoHxwRcPNvG6jZ8ni0B4FOdgYRUpGnhc'
+
+PROD = False
 
 if PROD == True:
     OSM_DATA_DIR = '/home/bender/routeoptimization/osmfiles/'
@@ -37,7 +39,7 @@ SECRET_KEY = 'django-insecure-$i30iqu@y_c51ei4ej@_slqk2lmt+6#0msdw(5h!5u(k^un1h0
 if PROD == False:
     DEBUG = True
 else:
-    DEBUG = True
+    DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.150.0.24']
 
@@ -144,7 +146,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -153,8 +155,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 #added Manually
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static"
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets')

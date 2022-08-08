@@ -4,6 +4,12 @@ from operator import index
 from sqlalchemy import create_engine, text
 import pandas as pd
 
+import vyuha.postgres_conn as pg
+
+# # #
+db = pg.Redshift('rakeshpanigrahy', '86RjNJz7zQ3thVTjGF6KpJKr', 'prod', 'dl3.ahwspl.net', 5439)
+
+
 def get_dl3_connection():
     conn = create_engine('redshift://rakeshpanigrahy:86RjNJz7zQ3thVTjGF6KpJKr@dataplatform.cozflcbz62sl.ap-south-1.redshift.amazonaws.com:5439/prod')
     return conn
@@ -54,3 +60,23 @@ def get_cluster_sales_data(start_date, end_date, unit_asset_id, is_export_as=Non
         print(output_file)
         df.to_csv(output_file, index=False)
     return df
+
+
+def exceltodl3(df, tablename, todelete=True, pagesize=10000, conditions={}):
+    print('doing excel file to dl3 table')
+
+    print('data read' + str(df.shape))
+    
+    if df.shape[0] > 0 and todelete == 1 and len(conditions) > 0:
+        counter = 0
+        q = f'''delete from {tablename}'''
+        for key, val in conditions.items():
+            if counter == 0:
+                q = q + f''' where {key} = '{val}' '''
+            else:
+                q = q + f''' and {key} = '{val}' '''
+            counter =+ 1
+        db.execute(q)
+
+    db.execute_vals(query=f'insert into {tablename} values %s', data=df, pagesize=pagesize)
+    print('data inserted')

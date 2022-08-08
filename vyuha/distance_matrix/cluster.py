@@ -4,7 +4,8 @@ import math
 import os
 from datetime import datetime, timedelta
 from vyuha.distance_matrix.cluster_validate import *
-
+from sklearn.cluster import DBSCAN, KMeans
+from sklearn import metrics
 
 class Cluster:
     def __init__(self, hub, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 10):
@@ -145,11 +146,11 @@ class Cluster:
             for place in self.places_dict[x]:
                 places.append(place)
                 cluster.append(x)
-        
+        print(final_output)
         cluster_report_path = 'vyuha/distance_matrix/output_files/cluster_reports/{}'.format(self.hub)
         if os.path.isdir(cluster_report_path) == False:
             os.makedirs(cluster_report_path)
-        cluster_report_path += '/cluster_report.csv'
+        cluster_report_path += '/final_cluster_report.csv'
 
         final_output.to_csv(cluster_report_path, index=True)
         
@@ -165,3 +166,74 @@ class Cluster:
             sentence = 'Cluster: {}\nSale Value Pass: {}%\nDistance Pass: {}%\nAvg Daily Sale: {}\nAvg Daily Distance: {}\n\n'.format(i, sale_value_pass_rate, distance_value_pass_rate, avg_daily_sale_value, avg_daily_distance)
             file.write(sentence)
         file.close()
+
+
+
+
+class dbscan_cluster:
+    def __init__(self, unit, df, eps, min_samples):
+        self.df = df
+        self.unit = unit
+        self.eps = eps
+        self.min_samples = min_samples
+
+    def start(self):
+        df = self.df
+        X = df.iloc[:, 4:].values
+        dbscan = DBSCAN(eps=self.eps, min_samples=self.min_samples)
+        model = dbscan.fit(X)
+        labels = model.labels_
+        n_cluters = len(set(labels)) - (1 if -1 in labels else 0)
+        df['cluster'] = labels
+        df['centroid'] = 0
+
+        centroid_lat = df.groupby('cluster').latitude.mean().reset_index()
+        centroid_long = df.groupby('cluster').longitude.mean().reset_index()
+        centroid_data = centroid_lat.merge(centroid_long, on='cluster')
+        centroid_data['Customer Name'] = centroid_data['cluster'].apply(lambda x:'Cluster - ' + str(x))
+        centroid_data['Customer Code'] = centroid_data['cluster'].apply(lambda x:'Cluster - ' + str(x))
+        centroid_data['distributor_id'] = self.df.iloc[0, 0]
+        centroid_data['Distributor Name'] = self.df.iloc[0, 1]
+        centroid_data['centroid'] = 1
+
+        df = pd.concat([df, centroid_data])
+        df['algo'] = 'dbscan'
+        self.result = df
+        return df
+
+class kmeans_cluster:
+    def __init__(self, unit, df, n_clusters=8, n_init=10, max_iter=300, tol=0.0001, algorithm='lloyd'):
+        self.df = df
+        self.unit = unit
+        self.n_clusters = n_clusters
+        self.n_init = n_init
+        self.max_iter = max_iter
+        self.tol = tol
+        self.algorithm = algorithm
+
+    def start(self):
+        df = self.df
+        X = df.iloc[:, 4:].values
+        kmeans = KMeans(n_clusters=self.n_clusters, n_init=self.n_init, max_iter=self.max_iter, tol=self.tol, algorithm=self.algorithm)
+        model = kmeans.fit(X)
+        labels = model.labels_
+        n_cluters = len(set(labels)) - (1 if -1 in labels else 0)
+        self.n_features_in_ = model.n_features_in_
+        self.cluster_centers_ = model.cluster_centers_
+        self.inertia_ = model.inertia_
+        df['cluster'] = labels
+        df['centroid'] = 0
+
+        centroid_lat = df.groupby('cluster').latitude.mean().reset_index()
+        centroid_long = df.groupby('cluster').longitude.mean().reset_index()
+        centroid_data = centroid_lat.merge(centroid_long, on='cluster')
+        centroid_data['Customer Name'] = centroid_data['cluster'].apply(lambda x:'Cluster - ' + str(x))
+        centroid_data['Customer Code'] = centroid_data['cluster'].apply(lambda x:'Cluster - ' + str(x))
+        centroid_data['distributor_id'] = self.df.iloc[0, 0]
+        centroid_data['Distributor Name'] = self.df.iloc[0, 1]
+        centroid_data['centroid'] = 1
+        
+        df = pd.concat([df, centroid_data])
+        df['algo'] = 'kmeans'
+        self.df = df
+        return self.df

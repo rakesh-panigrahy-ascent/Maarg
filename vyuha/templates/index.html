@@ -10,13 +10,16 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <title> {% block title %}{% endblock title %} </title>
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
+    {% comment %} <title> {% block title %}{% endblock title %} </title> {% endcomment %}
+    <title>MAARG</title>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">MAARG<span class="glyphicon glyphicon-road"></span></a>
+            <span><img src="{% static 'images/roadlogo.png' %}" style="height:50px; width:100px"></span>
+            <a class="navbar-brand" href="#">MAARG</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
                 aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -29,7 +32,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="cluster">Cluster</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    {% comment %} <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Link
@@ -42,7 +45,7 @@
                             </li>
                             <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
-                    </li>
+                    </li> {% endcomment %}
                     <li class="nav-item">
                         <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Link</a>
                     </li>
@@ -83,6 +86,120 @@ $(document).ready(function(){
                 alert(response.data);
             }
         });
+
+    $('#start_maarg').click(function(){
+            var maarg_distance_benchmark = $('#maarg_distance_benchmark').val()
+            var maarg_max_clusters_benchmark = $('#maarg_max_clusters_benchmark').val()
+            var maarg_sales_benchmark = $('#maarg_sales_benchmark').val()
+            var unit = $('#unit_name_asset_id').val()
+
+            if (maarg_distance_benchmark == '' || maarg_max_clusters_benchmark == '' || unit == 'Select' || unit == ''|| maarg_sales_benchmark == ''){
+                alert('Please enter the hyperparameters!');
+                return false
+            }
+    
+            form_data.append('maarg_distance_benchmark', maarg_distance_benchmark)
+            form_data.append('maarg_max_clusters_benchmark', maarg_max_clusters_benchmark)
+            form_data.append('unit', unit)
+            form_data.append('maarg_sales_benchmark', maarg_sales_benchmark)
+            
+            $.ajax({
+                url: 'start_maarg',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    alert(response.data)
+                },
+                error: function (response) {
+                    alert(response.data);
+                }
+            });
+    
+        });
+
+    $('#start_kmeans').click(function(){
+            var kmeans_n_clusters = $('#kmeans_n_clusters').val()
+            var kmeans_n_init = $('#kmeans_n_init').val()
+            var unit = $('#unit_name_asset_id').val()
+
+            var kmeans_max_iter = $('#kmeans_max_iter').val()
+            var kmeans_tol = $('#kmeans_tol').val()
+            var kmeans_algorithm = $('#kmeans_algorithm').val()
+
+            if (kmeans_n_clusters == '' || kmeans_n_init == '' || unit == 'Select' || unit == ''|| kmeans_max_iter == '' || kmeans_tol == ''|| kmeans_algorithm == ''){
+                alert('Please enter the hyperparameters!');
+                return false
+            }
+    
+            file_count = document.getElementById('kmeans_coordinate_file').files.length
+            for (var x = 0; x < file_count; x++) {
+                form_data.append("file", document.getElementById('kmeans_coordinate_file').files[x]);
+            }
+    
+            form_data.append('kmeans_n_clusters', kmeans_n_clusters)
+            form_data.append('kmeans_n_init', kmeans_n_init)
+            form_data.append('unit', unit)
+            form_data.append('kmeans_max_iter', kmeans_max_iter)
+            form_data.append('kmeans_tol', kmeans_tol)
+            form_data.append('kmeans_algorithm', kmeans_algorithm)
+            
+            $.ajax({
+                url: 'start_kmeans',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    alert(response.data)
+                },
+                error: function (response) {
+                    alert(response.data);
+                }
+            });
+    
+        });
+
+    $('#start_dbscan').click(function(){
+        var epsilon = $('#dbscan_epsilon').val()
+        var min_samples = $('#dbscan_min_samples').val()
+        var unit = $('#unit_name_asset_id').val()
+        if (epsilon == '' || min_samples == '' || unit == 'Select' || unit == ''){
+            alert('Please enter the hyperparameters!');
+            return false
+        }
+
+        file_count = document.getElementById('dbscan_coordinate_file').files.length
+        for (var x = 0; x < file_count; x++) {
+            form_data.append("file", document.getElementById('dbscan_coordinate_file').files[x]);
+        }
+
+        form_data.append('epsilon', epsilon)
+        form_data.append('min_samples', min_samples)
+        form_data.append('unit', unit)
+
+        $.ajax({
+            url: 'start_dbscan',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: 'post',
+            success: function (response) {
+                alert(response.data)
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
+
+    });
 
     $('#generate_sales_data').click(function(){
         unit_asset_id = $('#unit_name_asset_id').val()
@@ -128,23 +245,39 @@ $(document).ready(function(){
     });
     
     $('#start_clustering').click(function(){
-        unit_asset_id = $('#unit_name_asset_id').val()
-        form_data.append('unit_asset_id', unit_asset_id)
-        $.ajax({
-            url: 'start_clustering',
-            dataType: 'json',
-            cache: false,
-            contentType: false,
-            processData: false,
-            data: form_data,
-            type: 'post',
-            success: function (response) { // display success response
-                alert(response.data);
-            },
-            error: function (response) {
-                alert(response.data);
-            }
-        });
+        var clustering_method = $('#clustering_method').val()
+        if (clustering_method == 'kmeans'){
+            var myModal = new bootstrap.Modal(document.getElementById("kmeansmodal"), {});
+            myModal.show();
+        }
+        else if(clustering_method == 'dbscan'){
+            var myModal = new bootstrap.Modal(document.getElementById("dbscanmodal"), {});
+            myModal.show();
+        }
+        else if(clustering_method == 'maarg'){
+            var myModal = new bootstrap.Modal(document.getElementById("maargmodal"), {});
+            myModal.show();
+        }
+        else{
+            alert('Kindly select a clustering method !');
+        }
+        // unit_asset_id = $('#unit_name_asset_id').val()
+        // form_data.append('unit_asset_id', unit_asset_id)
+        // $.ajax({
+        //     url: 'start_clustering',
+        //     dataType: 'json',
+        //     cache: false,
+        //     contentType: false,
+        //     processData: false,
+        //     data: form_data,
+        //     type: 'post',
+        //     success: function (response) { // display success response
+        //         alert(response.data);
+        //     },
+        //     error: function (response) {
+        //         alert(response.data);
+        //     }
+        // });
     });
 
     $('#start_ors').click(function(){

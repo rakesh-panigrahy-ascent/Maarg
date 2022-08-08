@@ -21,22 +21,23 @@
     </div>
 
 
+    <div class="input-group mb-3">
+        <span class="input-group-text">Clustering Method</span>
+        <select class="form-select form-select-sm" id="clustering_method" aria-label=".form-select-sm example">
+            <option selected>Select</option>
+            <option value="kmeans">K Means</option>
+            <option value="dbscan">DBSCAN</option>
+            <option value="maarg">MAARG</option>
+        </select>
+    </div>
+
+
 
     <button type="button" class="btn btn-success" id='start_clustering'>Start Clutering</button>
     <button type="button" class="btn btn-success" id='generate_sales_data'>Generate Sales Data</button>
 
-<!-- <div class="alert alert-warning alert-dismissible fade show" role="alert" id='msg_div'>
-    <p id='msg'>You should check in on some of those fields below.</p>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div> -->
 </div>
-<div class="col-4">
-    <div class="form-group">
-        <label for="formFile" class="form-label">Log:</label>
-        <textarea class="form-control" id="log_text" rows="3" style='height: 300px;' disabled></textarea>
-    </div>
-</div>
-</div>
+<div class='col-4'>
 <table class="table">
     <thead>
       <tr>
@@ -53,5 +54,119 @@
         {% endfor %}
     </tbody>
   </table>
+  </div>
 </div>
+<br><br>
+<div class='row'>
+  <script type='text/javascript' src='https://tableau.ahwspl.net/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 1200px; height: 850px;'><object class='tableauViz' width='1200' height='850' style='display:none;'><param name='host_url' value='https%3A%2F%2Ftableau.ahwspl.net%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='OpsMAARG&#47;MAARG' /><param name='tabs' value='yes' /><param name='toolbar' value='yes' /><param name='showAppBanner' value='false' /></object></div>
+</div>
+</div>
+
+
+
+
+<!-- K-Means Modal -->
+<div class="modal fade" id="kmeansmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">K-Means</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="formFile" class="form-label">n_clusters</label>
+          <input class="form-control" type="text" id="kmeans_n_clusters" placeholder='8' value='8'>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">n_init</label>
+          <input class="form-control" type="text" id="kmeans_n_init" placeholder='10' value='10'>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">max_iter</label>
+          <input class="form-control" type="text" id="kmeans_max_iter" placeholder='300' value='300'>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">tol</label>
+          <input class="form-control" type="text" id="kmeans_tol" placeholder='0.0001' value='0.0001'>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">algorithm</label>
+          <input class="form-control" type="text" id="kmeans_algorithm" placeholder='lloyd' value='lloyd'>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">Geo-Coordinate File</label>
+          <input class="form-control" type="file" id="kmeans_coordinate_file">
+      </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="start_kmeans">GO</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- DBSCAN Modal -->
+  <div class="modal fade" id="dbscanmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">DBSCAN</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Epsilon</label>
+            <input class="form-control" type="text" id="dbscan_epsilon" placeholder='0.012' value='0.012'>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Min Samples</label>
+            <input class="form-control" type="text" id="dbscan_min_samples" placeholder='7' value='7'>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Geo-Coordinate File</label>
+            <input class="form-control" type="file" id="dbscan_coordinate_file">
+        </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="start_dbscan">GO</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- MAARG Modal -->
+<div class="modal fade" id="maargmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">MAARG</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="formFile" class="form-label">Sales Benchmark</label>
+          <input class="form-control" type="text" id="maarg_sales_benchmark" placeholder='45000' value='45000'>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">Distance Benchmark (In Meter)</label>
+          <input class="form-control" type="text" id="maarg_distance_benchmark" placeholder='30000' value='30000'>
+        </div>
+
+        <div class="mb-3">
+          <label for="formFile" class="form-label">Max Clusters</label>
+          <input class="form-control" type="text" id="maarg_max_clusters_benchmark" placeholder='7' value='7'>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="start_maarg">GO</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock body %}

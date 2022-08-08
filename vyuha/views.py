@@ -2,6 +2,7 @@ from asyncio.log import logger
 from dataclasses import dataclass
 import imp
 from optparse import Values
+from time import process_time_ns
 from urllib import response
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +13,9 @@ from Maarg.settings import *
 from vyuha.distance_matrix.config_ors_engine import *
 from vyuha.connection import *
 from vyuha.distance_matrix.cluster import *
+import vyuha.sheetioQuicks as sq
+
+driver,sheeter = sq.apiconnect()
 
 logging.basicConfig(filename='vyuha/distance_matrix/log/distance_matrix.log', level=logging.INFO)
 
@@ -50,7 +54,7 @@ def stop_ors(request):
    resp = {'data':'Stopping ORS Engine...'}
    return JsonResponse(resp)
 
-def start_clustering(request):
+def start_maarg(request):
    unit_asset_id = request.POST['unit_asset_id']
    asset_id, unit_name = unit_asset_id.split()[0], ' '.join(unit_asset_id.split()[1:])
    print(asset_id)
@@ -64,6 +68,83 @@ def start_clustering(request):
    resp = {'data':'Starting Clustering For {}'.format(unit_name)}
    return JsonResponse(resp)
 
+def start_dbscan(request):
+   epsilon = request.POST['epsilon']
+   min_samples = request.POST['min_samples']
+   unit = request.POST['unit']
+   asset_id, unit_name = unit.split()[0], ' '.join(unit.split()[1:])
+
+   distance_matrix_file = unit_name.title()+'_coordinates.csv'
+
+   try:
+      print('Copying file...')
+      handle_uploaded_file(request.FILES['file'], distance_matrix_file)
+   except:
+      print('No File Uploaded !', str(e))
+
+   input_dir = 'vyuha/distance_matrix/input_files/'
+   coordinate_file = input_dir+distance_matrix_file
+   try:
+      df = pd.read_csv(coordinate_file)
+      dbscan = dbscan_cluster(unit_name, df, eps=float(epsilon), min_samples=int(min_samples))
+      result = dbscan.start()
+      result.rename(columns={'Distributor Name':'distributor_name', 'Customer Code':'customer_code', 'Customer Name':'customer_name'}, inplace=True)
+
+      # exceltodl3(result, 'adhoc.ops_maarg_cluster', conditions={'algo':'dbscan', 'distributor_name':unit_name})
+      
+      existing_data = sq.sheetsToDf(sheeter,spreadsheet_id=CLUSTER_SHEET_ID,sh_name='Clusters')
+      existing_data.drop(existing_data[(existing_data['distributor_name'] == unit_name) & (existing_data['algo'] == 'dbscan')].index, inplace=True)
+      result = pd.concat([result, existing_data])
+      sq.dftoSheetsfast(driver,sheeter,result,sp_nam_id=CLUSTER_SHEET_ID,sh_name='Clusters')
+
+      resp = {'data':'Clusters Created !'}
+   except Exception as e:
+      print(str(e))
+      resp = {'data':str(e)}
+
+   return JsonResponse(resp)
+
+def start_kmeans(request):
+   kmeans_n_clusters = int(request.POST['kmeans_n_clusters'])
+   kmeans_n_init = int(request.POST['kmeans_n_init'])
+   kmeans_max_iter = int(request.POST['kmeans_max_iter'])
+   kmeans_tol = float(request.POST['kmeans_tol'])
+   kmeans_algorithm = request.POST['kmeans_algorithm']
+
+   unit = request.POST['unit']
+   asset_id, unit_name = unit.split()[0], ' '.join(unit.split()[1:])
+   print(unit_name)
+   distance_matrix_file = unit_name.title()+'_coordinates.csv'
+   
+   try:
+      print('Copying file...')
+      handle_uploaded_file(request.FILES['file'], distance_matrix_file)
+      print('Copied...')
+   except Exception as e:
+      print('No File Uploaded !', str(e))
+
+   input_dir = 'vyuha/distance_matrix/input_files/'
+   coordinate_file = input_dir+distance_matrix_file
+   try:
+      df = pd.read_csv(coordinate_file)
+      kmeans = kmeans_cluster(unit_name, df, n_clusters=kmeans_n_clusters, n_init=kmeans_n_init, max_iter=kmeans_max_iter, tol=kmeans_tol, algorithm=kmeans_algorithm)
+      result = kmeans.start()
+      result.rename(columns={'Distributor Name':'distributor_name', 'Customer Code':'customer_code', 'Customer Name':'customer_name'}, inplace=True)
+      # exceltodl3(result, 'adhoc.ops_maarg_cluster', conditions={'algo':'kmeans', 'distributor_name':unit_name})
+      
+      existing_data = sq.sheetsToDf(sheeter,spreadsheet_id=CLUSTER_SHEET_ID,sh_name='Clusters')
+      existing_data.drop(existing_data[(existing_data['distributor_name'] == unit_name) & (existing_data['algo'] == 'kmeans')].index, inplace=True)
+      result = pd.concat([result, existing_data])
+
+      sq.dftoSheetsfast(driver,sheeter,result,sp_nam_id=CLUSTER_SHEET_ID,sh_name='Clusters')
+      
+      resp = {'data':'Clusters Created !'}
+   except Exception as e:
+      print(str(e))
+      resp = {'data':str(e)}
+
+   return JsonResponse(resp)
+
 def generate_sales_data(request):
    unit_asset_id = request.POST['unit_asset_id']
    asset_id, unit_name = unit_asset_id.split()[0], ' '.join(unit_asset_id.split()[1:])
@@ -72,7 +153,7 @@ def generate_sales_data(request):
 
    get_cluster_sales_data(str(start_date), str(end_date), asset_id, unit_name)
 
-   resp = {'data':'Starting Clustering...'}
+   resp = {'data':'Sales Data Generated !'}
    return JsonResponse(resp) 
 
 def check_cluster_requirement(request):
@@ -89,7 +170,7 @@ def check_cluster_requirement(request):
       distance_matrix = output_files[0]
 
    sales_file = unit_name.title()+'.csv'
-   print(sales_file)
+
    output_dir = 'vyuha/distance_matrix/output_files/sales'
    output_files = os.listdir(output_dir)
    output_files = [x for x in output_files if sales_file in x]
