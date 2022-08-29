@@ -28,7 +28,7 @@ def get_distributor_names_id():
     df = pd.read_sql(t, conn)
     return df
 
-def getQuery(sqlname, start_date, end_date, unit_asset_id, dest='vyuha/sql/'):
+def getQuery(sqlname, start_date, end_date, unit_asset_id=None, dest='vyuha/sql/'):
     try:
         with open(dest + sqlname, 'r') as f:
             query = f.read()

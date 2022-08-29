@@ -32,20 +32,20 @@
                     <li class="nav-item">
                         <a class="nav-link" href="cluster">Cluster</a>
                     </li>
-                    {% comment %} <li class="nav-item dropdown">
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            Link
+                            Others
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="capacity_planning">Capacity Planning</a></li>
                             <li><a class="dropdown-item" href="#">Another action</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
                             <li><a class="dropdown-item" href="#">Something else here</a></li>
                         </ul>
-                    </li> {% endcomment %}
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Link</a>
                     </li>
@@ -69,7 +69,7 @@ $(document).ready(function(){
     var form_data = new FormData();
     csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
     form_data.append("csrfmiddlewaretoken", csrf_token);
-
+    $('.spinner-grow').hide();
     $.ajax({
             url: 'get_distance_matrix_log', // point to server-side URL
             dataType: 'json', // what to expect back from server
@@ -86,6 +86,100 @@ $(document).ready(function(){
                 alert(response.data);
             }
         });
+    
+    $('#get_capacity_data').click(function(){
+        $('.spinner-grow').show();
+        var start_date = $('#start_date').val()
+        var end_date = $('#end_date').val()
+        form_data.append('start_date', start_date)
+        form_data.append('end_date', end_date)
+        $.ajax({
+            url: 'get_capacity_data',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: 'post',
+            success: function (response) {
+                $('.spinner-grow').hide();
+                alert(response.data);
+            },
+            error: function (response) {
+                $('.spinner-grow').hide();
+                alert(response.data);
+            }
+        });
+    });
+    
+    $('#download_result').change(function(){
+        var download_result = $('#download_result').val()
+        location.href =  'download_result?download_result='+download_result
+    });
+
+    $('#calculate_capacity').click(function(){
+            $('.spinner-grow').show();
+            var start_date = $('#start_date').val()
+            var end_date = $('#end_date').val()
+            var start_hour = parseInt($('#start_hour').val())
+            var end_hour = parseInt($('#end_hour').val())
+            var kpi = $('#kpi').val()
+            var serviceability = parseFloat($('#serviceability').val())
+            var picker_capacity = parseInt($('#picker_capacity').val())
+            var checker_capacity = parseInt($('#checker_capacity').val())
+            var dispatch_capacity = parseInt($('#dispatch_capacity').val())
+
+            var efficiency = parseFloat($('#efficiency').val())
+            picker_capacity = picker_capacity*efficiency
+            checker_capacity = checker_capacity*efficiency
+            dispatch_capacity = dispatch_capacity*efficiency
+
+            hourtype = $('#hourtype').prop('checked')
+            split_hour = 2
+            if (hourtype == false){split_hour = 1}
+
+
+            if (/*start_hour == 'Select' || end_hour == 'Select' || kpi == 'Select' || */serviceability == ''|| picker_capacity == '' || checker_capacity == '' || dispatch_capacity == '' || start_date == '' || end_date == ''){
+                alert('Please enter the hyperparameters!');
+                return false
+            }
+
+            if (start_hour > end_hour){
+                alert('Start hour can not be greater than end hour !')
+                return false
+            }
+    
+            /*form_data.append('start_hour', start_hour)
+            form_data.append('end_hour', end_hour)
+            form_data.append('kpi', kpi)*/
+            form_data.append('serviceability', serviceability)
+            form_data.append('picker_capacity', picker_capacity)
+            form_data.append('checker_capacity', checker_capacity)
+            form_data.append('dispatch_capacity', dispatch_capacity)
+            form_data.append('start_date', start_date)
+            form_data.append('end_date', end_date)
+            form_data.append('split_hour', split_hour)
+
+            
+            $.ajax({
+                url: 'calculate_capacity',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    $('.spinner-grow').hide();
+                    alert(response.data);
+                },
+                error: function (response) {
+                    $('.spinner-grow').hide();
+                    alert(response.data);
+                }
+            });
+    
+    });
 
     $('#start_maarg').click(function(){
             var maarg_distance_benchmark = $('#maarg_distance_benchmark').val()

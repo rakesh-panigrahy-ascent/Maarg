@@ -14,5 +14,9 @@ urlpatterns = [
     path('check_cluster_requirement', views.check_cluster_requirement, name='check_cluster_requirement'),
     path('generate_sales_data', views.generate_sales_data, name='generate_sales_data'),
     path('start_dbscan', views.start_dbscan, name='start_dbscan'),
-    path('start_kmeans', views.start_kmeans, name='start_kmeans')
+    path('start_kmeans', views.start_kmeans, name='start_kmeans'),
+    path('capacity_planning', views.capacity_planning, name='capacity_planning'),
+    path('calculate_capacity', views.calculate_capacity, name='calculate_capacity'),
+    path('download_result', views.download_result, name='download_result'),
+    path('get_capacity_data', views.get_capacity_data, name='get_capacity_data')
 ]

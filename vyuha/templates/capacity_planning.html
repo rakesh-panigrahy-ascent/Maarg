@@ -1,0 +1,106 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<div class='container'>
+  <br /><br />
+
+  <div class="row">
+    <div class='col-8'>
+
+      <div class="form-group mb-3">
+        <label>Start Date</label>
+        <input type="date" class="form-control form-control-sm" id="start_date" placeholder="0.8">
+      </div>
+
+      <div class="form-group mb-3">
+        <label>End Date</label>
+        <input type="date" class="form-control form-control-sm" id="end_date" placeholder="0.8">
+      </div>
+
+
+      <div class="input-group mb-3" style="display:None">
+        <span class="input-group-text">Start Hour</span>
+        <select class="form-select form-select-sm" id="start_hour" aria-label=".form-select-sm example">
+          <option selected>Select</option>
+          {% for hour in day_hours %}
+          <option value="{{hour}}">{{hour}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="input-group mb-3" style="display:None">
+        <span class="input-group-text">End Hour</span>
+        <select class="form-select form-select-sm" id="end_hour" aria-label=".form-select-sm example">
+          <option selected>Select</option>
+          {% for hour in day_hours %}
+          <option value="{{hour}}">{{hour}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+
+
+      <div class="input-group mb-3" style="display:None">
+        <span class="input-group-text">KPI</span>
+        <select class="form-select form-select-sm" id="kpi" aria-label=".form-select-sm example">
+          <option selected>Select</option>
+          <option value="Picking">Picking</option>
+          <option value="Checking">Checking</option>
+          <option value="Dispatch">Dispatch</option>
+          <option value="Modification">Modification</option>
+        </select>
+      </div>
+
+
+
+      <div class="form-group mb-3">
+        <label>Serviceability</label>
+        <input type="text" class="form-control form-control-sm" id="serviceability" placeholder="0.9" value="0.9">
+      </div>
+
+      <div class="form-group mb-3">
+        <div class="row">
+          <div class='col-4'>
+            <label>Picker Line Item</label>
+            <input type="text" class="form-control form-control-sm" id="picker_capacity" placeholder="70" value="70">
+          </div>
+          <div class='col-4'>
+            <label>Checker Quantity</label>
+            <input type="text" class="form-control form-control-sm" id="checker_capacity" placeholder="540" value="540">
+          </div>
+          <div class='col-4'>
+            <label>Dispatch Picklist</label>
+            <input type="text" class="form-control form-control-sm" id="dispatch_capacity" placeholder="59" value="59">
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label>Efficiency</label>
+          <input type="text" class="form-control form-control-sm" id="efficiency" placeholder="0.8" value="1">
+        </div>
+
+        <div class="form-check form-switch form-control-lg" title="Disable for 1 Hour">
+          <input class="form-check-input" type="checkbox" role="switch" id="hourtype" checked>
+          <label class="form-check-label" for="flexSwitchCheckDefault">2 Hours</label>
+        </div>
+        <br>
+        <button type="button" class="btn btn-success" id='calculate_capacity'>Calculate <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></button>
+        <button type="button" class="btn btn-success" id='get_capacity_data'>Get Capacity Data</span></button>
+      </div>
+      </div>
+      <div class="col-4">
+        <br>
+        <div class="input-group mb-3">
+          <span class="input-group-text">Download</span>
+          <select class="form-select form-select-sm" id="download_result" aria-label=".form-select-sm example">
+            <option selected>Select</option>
+            {% for file in output_files %}
+            <option value="{{file}}">{{file}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <br><br>
+  </div>
+  {% endblock body %}

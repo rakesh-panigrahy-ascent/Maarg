@@ -2,10 +2,11 @@ from asyncio.log import logger
 from dataclasses import dataclass
 import imp
 from optparse import Values
+from posixpath import split
 from time import process_time_ns
 from urllib import response
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from vyuha.distance_matrix.calculate_distance_matrix import *
 import logging
 from vyuha.tasks import *
@@ -14,6 +15,8 @@ from vyuha.distance_matrix.config_ors_engine import *
 from vyuha.connection import *
 from vyuha.distance_matrix.cluster import *
 import vyuha.sheetioQuicks as sq
+from vyuha.others.capacity_planning import *
+from dateutil.relativedelta import relativedelta
 
 driver,sheeter = sq.apiconnect()
 
@@ -77,7 +80,6 @@ def start_dbscan(request):
    distance_matrix_file = unit_name.title()+'_coordinates.csv'
 
    try:
-      print('Copying file...')
       handle_uploaded_file(request.FILES['file'], distance_matrix_file)
    except:
       print('No File Uploaded !', str(e))
@@ -117,9 +119,7 @@ def start_kmeans(request):
    distance_matrix_file = unit_name.title()+'_coordinates.csv'
    
    try:
-      print('Copying file...')
       handle_uploaded_file(request.FILES['file'], distance_matrix_file)
-      print('Copied...')
    except Exception as e:
       print('No File Uploaded !', str(e))
 
@@ -247,4 +247,102 @@ def get_distance_matrix_log(request):
    for line in file.readlines():
       data = data+line
    resp = {'data':data}
+   return JsonResponse(resp)
+
+def capacity_planning(request):
+   day_hours = np.arange(0, 24)
+   # output_dir = 'vyuha/others/files/output_files/'
+   # weekday_summary_path = output_dir + 'Capacity Planning Weekday Summary.csv'
+   # weekday_summary = pd.read_csv(weekday_summary_path)
+   # print(weekday_summary.to_dict())
+   output_dir = 'vyuha/others/files/output_files/'
+   output_files = os.listdir(output_dir)
+   output_files = sorted([x for x in output_files if '.csv' in x])
+
+   resp = {'day_hours':day_hours, 'output_files':output_files}
+   return render(request, 'capacity_planning.html', resp)
+
+def calculate_capacity(request):
+   start_date = datetime.strptime(request.POST['start_date'], '%Y-%m-%d').date()
+   end_date = datetime.strptime(request.POST['end_date'], '%Y-%m-%d').date()
+   start_hour = 0#int(request.POST['start_hour'])
+   end_hour = 23#int(request.POST['end_hour'])
+   # kpi = request.POST['kpi']
+   picker_capacity = int(request.POST['picker_capacity'])
+   checker_capacity = int(request.POST['checker_capacity'])
+   dispatch_capacity = int(request.POST['dispatch_capacity'])
+   
+   serviceability = float(request.POST['serviceability'])
+   split_hour = int(request.POST['split_hour'])
+   for kpi in ['Picking', 'Checking', 'Dispatch']:
+      if kpi == 'Picking':
+         kpi_name = 'total_line_items'
+         capacity = picker_capacity #70
+      elif kpi == 'Checking':
+         kpi_name = 'quantity'
+         capacity = checker_capacity #450
+      elif kpi == 'Dispatch':
+         kpi_name = 'challan_count'
+         capacity = dispatch_capacity#59
+      else:
+         kpi_name = 'modified_line_items'
+         capacity = 70
+
+      input_dir = 'vyuha/others/files/input_files/'
+      
+      input_file = input_dir+'Capacity Planning.csv'
+      df = pd.read_csv(input_file)
+      print(df)
+      current_date = start_date.replace(day=1)
+      end_date = end_date + relativedelta(months=1)
+      end_date = end_date.replace(day=1) - timedelta(days=1)
+      
+      while current_date <= end_date:
+         last_date = current_date + relativedelta(months=1) - timedelta(days=1)
+         print(kpi_name)
+         print(current_date, last_date)
+         print(type(current_date))
+         cp = CapacityPlanning(df, current_date, last_date,  capacity, start_hour, end_hour, kpi_name, split_hour, kpi, serviceability)
+         cp.start()
+         current_date += relativedelta(months=1)
+
+   resp = {'data':'Calculation done!'}
+   return JsonResponse(resp)
+
+
+def download_result(request):
+   filename = request.GET['download_result']
+   file_path = 'vyuha/others/files/output_files/'+filename
+   
+   if os.path.exists(file_path):
+      file = open(file_path, 'rb')
+      response = FileResponse(file, content_type='text/csv')
+      response['Content-Disposition'] = 'attachment; filename="'+filename+'"'
+      return response
+   else:
+      print('Not Exists!')
+      return redirect(capacity_planning)
+
+def get_capacity_data(request):
+   start_date = datetime.strptime(request.POST['start_date'], '%Y-%m-%d').date()
+   end_date = datetime.strptime(request.POST['end_date'], '%Y-%m-%d').date()
+   
+   start_date = start_date.replace(day=1)
+   end_date = end_date + relativedelta(months=1)
+   end_date = end_date.replace(day=1)
+   end_date -= timedelta(days=1)
+   
+   print(start_date)
+   print(end_date)
+
+   query = getQuery('capacity_planning.sql', start_date, end_date)
+   t = text(query)
+   print(t)
+   conn = get_dl3_connection()
+   print('Fetching Data...')
+   df = pd.read_sql(t, conn)
+   input_dir = 'vyuha/others/files/input_files/'
+   input_file = input_dir+'Capacity Planning.csv'
+   df.to_csv(input_file, index=False)
+   resp = {'data':'Imported Data!'}
    return JsonResponse(resp)
