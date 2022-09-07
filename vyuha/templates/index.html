@@ -130,9 +130,9 @@ $(document).ready(function(){
             var dispatch_capacity = parseInt($('#dispatch_capacity').val())
 
             var efficiency = parseFloat($('#efficiency').val())
-            picker_capacity = picker_capacity*efficiency
-            checker_capacity = checker_capacity*efficiency
-            dispatch_capacity = dispatch_capacity*efficiency
+            picker_capacity = parseInt(picker_capacity*efficiency)
+            checker_capacity = parseInt(checker_capacity*efficiency)
+            dispatch_capacity = parseInt(dispatch_capacity*efficiency)
 
             hourtype = $('#hourtype').prop('checked')
             split_hour = 2

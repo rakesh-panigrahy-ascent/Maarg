@@ -166,21 +166,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
 
 # Tableau Creadentials
-# tableau_auth = TSC.TableauAuth('Ascentuser1', 'oarjacawfapsit0grelsEydd')
-# server = TSC.Server('https://tableau.ahwspl.net', use_server_version=True)
-
-
-
-
-# with server.auth.sign_in(tableau_auth):
-#     req_option = TSC.RequestOptions()
-#     workbook = server.workbooks.get_by_id('6bbbabc3-1529-4d5b-9e6b-3eb842c5fa4d')
-#     server.workbooks.populate_views(workbook)
-#     req_option.filter.add(
-#         TSC.Filter(TSC.RequestOptions.Field.Name, TSC.RequestOptions.Operator.Equals, 'Capacity Planning Unit Wise Dashboard'))
-#     all_views, pagination_item = server.views.get(req_option)
-#     if not all_views:
-#         raise LookupError("View with the specified name was not found.")
-#     view_item = all_views[0]
-#     csv_req_option = TSC.CSVRequestOptions()
-#     server.views.populate_csv(view_item, csv_req_option)
+tableau_auth = TSC.TableauAuth('Ascentuser1', 'oarjacawfapsit0grelsEydd')
+server = TSC.Server('https://tableau.ahwspl.net', use_server_version=True)

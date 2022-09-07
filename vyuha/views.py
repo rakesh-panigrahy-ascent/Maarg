@@ -305,6 +305,11 @@ def calculate_capacity(request):
          cp = CapacityPlanning(df, current_date, last_date,  capacity, start_hour, end_hour, kpi_name, split_hour, kpi, serviceability)
          cp.start()
          current_date += relativedelta(months=1)
+   cp.fetch_tableau_data()
+   cp.export_final_data(start_date, end_date)
+
+
+   
 
    resp = {'data':'Calculation done!'}
    return JsonResponse(resp)

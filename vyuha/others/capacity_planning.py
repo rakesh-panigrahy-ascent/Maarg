@@ -8,8 +8,10 @@ warnings.filterwarnings('ignore')
 import math
 import sys
 import os
+from Maarg.settings import *
+import vyuha.sheetioQuicks as sq
 
-
+driver,sheeter = sq.apiconnect()
 
 class CapacityPlanning:
     def __init__(self, data, start_date, end_date, target_kpi, start_hour = 10, end_hour = 19, kpi_name='total_line_items', split_hour = 2, kpi='Picking', serviceability=0.9):
@@ -231,6 +233,72 @@ class CapacityPlanning:
         output_file = output_dir + '{} - {} - Service Level Result.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
         data.to_csv(output_file, index=False)
 
+
+    def fetch_tableau_data(self):
+        with server.auth.sign_in(tableau_auth):
+            req_option = TSC.RequestOptions()
+            workbook = server.workbooks.get_by_id('6bbbabc3-1529-4d5b-9e6b-3eb842c5fa4d')
+            server.workbooks.populate_views(workbook)
+            req_option.filter.add(
+                TSC.Filter(
+                    TSC.RequestOptions.Field.Name,
+                    TSC.RequestOptions.Operator.Equals,
+                    'Capacity Planning Dashboard Ideal'
+                )
+            )
+            
+            all_views, pagination_item = server.views.get(req_option)    
+            if not all_views:
+                raise LookupError("View with the specified name was not found.")
+            print(all_views)
+            view_item = all_views[0]
+            print(view_item)
+            csv_req_option = TSC.CSVRequestOptions()
+            server.views.populate_csv(view_item, csv_req_option)
+            
+            with open('vyuha/others/files/output_files/Capacity_Planning_V1.csv', 'wb') as f:
+                f.write(b''.join(view_item.csv))
+                print("-----------------Data Successfully Written to Capacity_Planning.csv--------------------")
+
+    def export_final_data(self, start_date, end_date):
+        v1_capacity_planning = pd.read_csv('vyuha/others/files/output_files/Capacity_Planning_V1.csv')
+        v1_capacity_planning = v1_capacity_planning[v1_capacity_planning['Distributor Name'].notnull()]
+        v1_capacity_planning.rename(columns={'Distributor Name':'Dist'}, inplace=True)
+        v1_capacity_planning = v1_capacity_planning[v1_capacity_planning['Date'] != 'All']
+        v1_capacity_planning['Date'] = pd.to_datetime(v1_capacity_planning['Date'])
+
+
+        v2_capacity_planning = None
+        for capacity_csv in os.listdir('vyuha/others/files/output_files/'):
+            if 'Result' not in capacity_csv:
+                continue
+
+            capacity_v2_df = pd.read_csv('vyuha/others/files/output_files/{}'.format(capacity_csv))
+            capacity_v2_df.rename(columns={'dt':'Date'}, inplace=True)
+        #     print(capacity_v2_df.columns)
+            if 'Dispatch' in capacity_csv:
+                kpi_name = 'Dispatch-Sorting'
+            elif 'Checking' in capacity_csv:
+                kpi_name = 'Checking-Checking & Packing'
+            elif 'Picking' in capacity_csv:
+                kpi_name = 'Store-Picking'
+            capacity_v2_df['Department'] = kpi_name
+            capacity_v2_df['Measure Names'] = 'Ideal Head Count'
+            capacity_v2_df['Date'] = pd.to_datetime(capacity_v2_df['Date'], format='%B-%y')
+            capacity_v2_df = capacity_v2_df[['Dist', 'Department', 'Measure Names', 'Date', 'ManPower']]
+            if v2_capacity_planning is None:
+                v2_capacity_planning = capacity_v2_df
+            else:
+                v2_capacity_planning = pd.concat([v2_capacity_planning, capacity_v2_df])
+        final_df = v1_capacity_planning.merge(v2_capacity_planning, on=['Dist', 'Department', 'Measure Names', 'Date'], how='left')
+        final_df['ManPower'].fillna(0, inplace=True)
+        final_df['Measure Values'] = final_df['Measure Values'].apply(lambda x:float(''.join(x.split(','))))
+        final_df['Measure Values'] = final_df['Measure Values'] + final_df['ManPower']
+        final_df.drop(columns=['ManPower'], inplace=True)
+        final_df['Date'] = final_df['Date'].dt.date
+        final_df = final_df[(final_df['Date'] >= start_date) & (final_df['Date'] <= end_date)]
+        sq.dftoSheetsfast(driver,sheeter,final_df,sp_nam_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='Sheet1')
+        final_df.to_csv('vyuha/others/files/output_files/Output.csv', index=False)
         
     def start(self):
         for dist in self.data['dist_name'].unique():

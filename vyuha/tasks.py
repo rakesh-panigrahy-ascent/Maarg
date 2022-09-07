@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from celery import shared_task
 
-from vyuha.distance_matrix.calculate_distance_matrix import *
+from vyuha.distance_matrix.calculate_distance_matrix_v2 import *
 from vyuha.distance_matrix.cluster import *
 
 app = Celery('tasks', backend='amqp', broker='amqp://')
