@@ -79,10 +79,23 @@
           <input type="text" class="form-control form-control-sm" id="efficiency" placeholder="0.8" value="1">
         </div>
 
-        <div class="form-check form-switch form-control-lg" title="Disable for 1 Hour">
-          <input class="form-check-input" type="checkbox" role="switch" id="hourtype" checked>
-          <label class="form-check-label" for="flexSwitchCheckDefault">2 Hours</label>
+    <div class="form-group mb-3">
+      <div class="row">
+        <div class='col-3'>
+          <div class="form-check form-switch form-control-lg" title="Disable for 1 Hour">
+            <input class="form-check-input" type="checkbox" role="switch" id="hourtype" checked>
+            <label class="form-check-label" for="flexSwitchCheckDefault">2 Hours</label>
+          </div>
         </div>
+        <div class='col-2'>
+          <div class="form-check form-switch form-control-lg" title="Calculate Projection">
+            <input class="form-check-input" type="checkbox" role="switch" id="project">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Project</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
         <br>
         <button type="button" class="btn btn-success" id='calculate_capacity'>Calculate <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></button>
         <button type="button" class="btn btn-success" id='get_capacity_data'>Get Capacity Data</span></button>
@@ -102,5 +115,45 @@
       </div>
     </div>
     <br><br>
+  </div>
+
+
+
+  <!-- Projection Modal -->
+  <div class="modal fade" id="projection_input" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Project Man Power</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Net Revenue</label>
+            <input class="form-control" type="text" id="net_revenue" placeholder='100000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Inter Company</label>
+            <input class="form-control" type="text" id="intercompany" placeholder='10000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Pharma Intercompany PL</label>
+            <input class="form-control" type="text" id="pl" placeholder='10000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Liquidation</label>
+            <input class="form-control" type="text" id="liquidation" placeholder='10000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">JIT</label>
+            <input class="form-control" type="text" id="jit" placeholder='10000000' value= 0>
+          </div>
+        </div>
+        <div class="modal-footer">
+            {% comment %} <button type="button" class="btn btn-primary" id="start_dbscan">GO</button> {% endcomment %}
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
   {% endblock body %}

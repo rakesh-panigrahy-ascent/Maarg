@@ -14,7 +14,7 @@ import vyuha.sheetioQuicks as sq
 driver,sheeter = sq.apiconnect()
 
 class CapacityPlanning:
-    def __init__(self, data, start_date, end_date, target_kpi, start_hour = 10, end_hour = 19, kpi_name='total_line_items', split_hour = 2, kpi='Picking', serviceability=0.9):
+    def __init__(self, data, start_date, end_date, target_kpi, start_hour = 10, end_hour = 19, kpi_name='total_line_items', split_hour = 2, kpi='Picking', serviceability=0.9, total_projection_value=0, v1_value = 0, v2_value = 0):
         self.operating_hours = pd.read_excel('vyuha/others/files/input_files/operating_hours.xlsx', 'Sheet1')
         data['time_slot'] = pd.to_datetime(data['time_slot'])
         data['scan_date'] = pd.to_datetime(data['scan_date'])
@@ -39,6 +39,14 @@ class CapacityPlanning:
         self.serviceability = serviceability*100
         self.daily_master_summary =  None
         self.dist_data = {}
+        self.total_projection_value = total_projection_value
+        self.v1_value = v1_value
+        self.v2_value = v2_value
+        
+        self.report_prefix = None 
+        if total_projection_value != 0:
+            self.report_prefix = 'Projected'
+
 
     def rectify_data(self, data):
         try:
@@ -297,8 +305,31 @@ class CapacityPlanning:
         final_df.drop(columns=['ManPower'], inplace=True)
         final_df['Date'] = final_df['Date'].dt.date
         final_df = final_df[(final_df['Date'] >= start_date) & (final_df['Date'] <= end_date)]
-        sq.dftoSheetsfast(driver,sheeter,final_df,sp_nam_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='Sheet1')
+        final_df = final_df.pivot_table(index=['Date', 'Department', 'Dist', 'KPI', 'MIS Dept'], columns=['Measure Names'], values='Measure Values').reset_index()
+        final_df['Ideal Cost'] = final_df['Ideal Head Count'] * final_df['Ideal Avg Salary']
         final_df.to_csv('vyuha/others/files/output_files/Output.csv', index=False)
+        if self.report_prefix == None:
+            sq.dftoSheetsfast(driver,sheeter,final_df,sp_nam_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='Sheet1')
+        else:
+            revenue_Data = sq.sheetsToDf(sheeter,spreadsheet_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='revenue data')
+            revenue_Data['Date'] = pd.to_datetime(revenue_Data['Date'])
+            final_df['Date'] = pd.to_datetime(final_df['Date'])
+            revenue_Data.rename(columns={'dist_name':'Dist'}, inplace=True)
+            
+            col = final_df.columns
+            final_data = final_df.merge(revenue_Data, on=['Dist', 'Date'], how='left')
+            final_data['Total'] = final_data['Total'].astype(float)
+            final_data['V1'] = final_data['V1'].astype(float)
+            final_data.loc[~final_data['KPI'].isin(['Picklist Line Items', 'Picklist Qty', 'Picklist Dispatched']), 'Monthly Actual Value'] = (final_data['Monthly Actual Value'] / final_data['V1'])*self.v1_value
+            final_data.loc[~final_data['KPI'].isin(['Picklist Line Items', 'Picklist Qty', 'Picklist Dispatched']), 'Daily Actual Value'] = final_data['Monthly Actual Value']/26
+            final_data.loc[~final_data['KPI'].isin(['Picklist Line Items', 'Picklist Qty', 'Picklist Dispatched']), 'Ideal Head Count'] = (final_data['Ideal Head Count'] / final_data['V1'])*self.v1_value
+            final_data.loc[~final_data['KPI'].isin(['Picklist Line Items', 'Picklist Qty', 'Picklist Dispatched']), 'Ideal Cost'] = final_data['Ideal Head Count'] * final_data['Ideal Avg Salary']
+            final_data = final_data[col]
+            final_data['Date'] = final_data['Date'].dt.date
+            print('final_data')
+            print(final_data)
+            # final_data.to_csv('Projected Output.csv', index=False)
+            sq.dftoSheetsfast(driver,sheeter,final_data,sp_nam_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='Projected')
         
     def start(self):
         for dist in self.data['dist_name'].unique():

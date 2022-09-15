@@ -117,6 +117,20 @@ $(document).ready(function(){
         location.href =  'download_result?download_result='+download_result
     });
 
+
+    $('#project').change(function(){
+        $('#net_revenue').val(0)
+        $('#intercompany').val(0)
+        $('#pl').val(0)
+        $('#liquidation').val(0)
+        $('#jit').val(0)
+        project = $('#project').prop('checked')
+        if (project == true){
+            var myModal = new bootstrap.Modal(document.getElementById("projection_input"), {});
+            myModal.show();
+        }
+    });
+
     $('#calculate_capacity').click(function(){
             $('.spinner-grow').show();
             var start_date = $('#start_date').val()
@@ -148,6 +162,24 @@ $(document).ready(function(){
                 alert('Start hour can not be greater than end hour !')
                 return false
             }
+
+
+
+            //Projection Parameter
+            net_revenue = parseInt($('#net_revenue').val())
+            intercompany = parseInt($('#intercompany').val())
+            pl = parseInt($('#pl').val())
+            liquidation = parseInt($('#liquidation').val())
+            jit = parseInt($('#jit').val())
+
+            v1_value = intercompany + pl + liquidation
+            v2_value = net_revenue + jit
+
+            total_projection_value = net_revenue + intercompany + pl + liquidation + jit
+            
+            if (total_projection_value == 0 || total_projection_value == ''){total_projection_value = 0}
+
+
     
             /*form_data.append('start_hour', start_hour)
             form_data.append('end_hour', end_hour)
@@ -159,6 +191,9 @@ $(document).ready(function(){
             form_data.append('start_date', start_date)
             form_data.append('end_date', end_date)
             form_data.append('split_hour', split_hour)
+            form_data.append('total_projection_value', total_projection_value)
+            form_data.append('v1_value', v1_value)
+            form_data.append('v2_value', v2_value)
 
             
             $.ajax({

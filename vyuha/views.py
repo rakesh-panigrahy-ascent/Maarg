@@ -271,6 +271,9 @@ def calculate_capacity(request):
    picker_capacity = int(request.POST['picker_capacity'])
    checker_capacity = int(request.POST['checker_capacity'])
    dispatch_capacity = int(request.POST['dispatch_capacity'])
+   total_projection_value = int(request.POST['total_projection_value'])
+   v1_value = int(request.POST['v1_value'])
+   v2_value = int(request.POST['v2_value'])
    
    serviceability = float(request.POST['serviceability'])
    split_hour = int(request.POST['split_hour'])
@@ -296,13 +299,38 @@ def calculate_capacity(request):
       current_date = start_date.replace(day=1)
       end_date = end_date + relativedelta(months=1)
       end_date = end_date.replace(day=1) - timedelta(days=1)
-      
+
+      if total_projection_value != 0:
+         col = df.columns
+         revenue_Data = sq.sheetsToDf(sheeter,spreadsheet_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='revenue data')
+         
+         df['scan_date'] = pd.to_datetime(df['scan_date'])
+         revenue_Data['Date'] = pd.to_datetime(revenue_Data['Date'])
+         
+         df['yr'] = df['scan_date'].dt.year
+         df['month'] = df['scan_date'].dt.month
+         revenue_Data['yr'] = revenue_Data['Date'].dt.year
+         revenue_Data['month'] = revenue_Data['Date'].dt.month
+
+         final_data = df.merge(revenue_Data, on=['dist_name', 'month', 'yr'], how='left')
+         final_data['Total'] = final_data['Total'].astype(float)
+         final_data['V2'] = final_data['V2'].astype(float)
+         final_data['V1'] = final_data['V1'].astype(float)
+         final_data['challan_count'] = (final_data['challan_count'] / final_data['V2'])*v2_value
+         final_data['total_line_items'] = (final_data['total_line_items'] / final_data['V2'])*v2_value
+         final_data['item_value'] = (final_data['item_value'] / final_data['V2'])*v2_value
+         final_data['quantity'] = (final_data['quantity'] / final_data['V2'])*v2_value
+         print(final_data)
+         final_data = final_data[col]
+      else:
+         final_data = df.copy()
+
       while current_date <= end_date:
          last_date = current_date + relativedelta(months=1) - timedelta(days=1)
          print(kpi_name)
          print(current_date, last_date)
          print(type(current_date))
-         cp = CapacityPlanning(df, current_date, last_date,  capacity, start_hour, end_hour, kpi_name, split_hour, kpi, serviceability)
+         cp = CapacityPlanning(final_data, current_date, last_date,  capacity, start_hour, end_hour, kpi_name, split_hour, kpi, serviceability, total_projection_value, v1_value, v2_value)
          cp.start()
          current_date += relativedelta(months=1)
    cp.fetch_tableau_data()
