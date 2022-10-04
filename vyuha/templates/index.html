@@ -152,6 +152,8 @@ $(document).ready(function(){
             split_hour = 2
             if (hourtype == false){split_hour = 1}
 
+            roaster = $('#roaster_plan').prop('checked')
+
 
             if (/*start_hour == 'Select' || end_hour == 'Select' || kpi == 'Select' || */serviceability == ''|| picker_capacity == '' || checker_capacity == '' || dispatch_capacity == '' || start_date == '' || end_date == ''){
                 alert('Please enter the hyperparameters!');
@@ -194,6 +196,7 @@ $(document).ready(function(){
             form_data.append('total_projection_value', total_projection_value)
             form_data.append('v1_value', v1_value)
             form_data.append('v2_value', v2_value)
+            form_data.append('roaster', roaster)
 
             
             $.ajax({

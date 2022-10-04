@@ -10,11 +10,12 @@ import sys
 import os
 from Maarg.settings import *
 import vyuha.sheetioQuicks as sq
+from vyuha.others.roaster_planning import *
 
 driver,sheeter = sq.apiconnect()
 
 class CapacityPlanning:
-    def __init__(self, data, start_date, end_date, target_kpi, start_hour = 10, end_hour = 19, kpi_name='total_line_items', split_hour = 2, kpi='Picking', serviceability=0.9, total_projection_value=0, v1_value = 0, v2_value = 0):
+    def __init__(self, data, start_date, end_date, target_kpi, start_hour = 10, end_hour = 19, kpi_name='total_line_items', split_hour = 2, kpi='Picking', serviceability=0.9, total_projection_value=0, v1_value = 0, v2_value = 0, roaster='false'):
         self.operating_hours = pd.read_excel('vyuha/others/files/input_files/operating_hours.xlsx', 'Sheet1')
         data['time_slot'] = pd.to_datetime(data['time_slot'])
         data['scan_date'] = pd.to_datetime(data['scan_date'])
@@ -42,6 +43,7 @@ class CapacityPlanning:
         self.total_projection_value = total_projection_value
         self.v1_value = v1_value
         self.v2_value = v2_value
+        self.roaster = roaster
         
         self.report_prefix = None 
         if total_projection_value != 0:
@@ -108,15 +110,8 @@ class CapacityPlanning:
             
             for dt in date_range:
                 pre_inactive_hours = data[(data['scan_date'].dt.date == dt) & (data['active_hour'] == 0) & (data['hour'] < start_hour)][kpi_name].sum()
-    #             print('----------')
-    #             print(dt)
-    #             print(pre_inactive_hours)
-    #             print(post_inactive_hours)
                 pending_tasks = pre_inactive_hours + post_inactive_hours
                 post_inactive_hours = data[(data['scan_date'].dt.date == dt) & (data['active_hour'] == 0) & (data['hour'] > end_hour)][kpi_name].sum()
-    #             print(pre_inactive_hours)
-    #             print(post_inactive_hours)
-    #             print('Total Pending', pending_tasks)
                 data.loc[(data['hour']==start_hour) & (data['scan_date'].dt.date==dt), ['previous_day_pending_quantum']] = pending_tasks
             data['actual_quantum'] = data[kpi_name]/self.split_hour
             data['left_quantum'] = data[kpi_name] - (data[kpi_name]/self.split_hour)
@@ -156,7 +151,6 @@ class CapacityPlanning:
         self.manpower_list = []
         self.dist_list = []
         for dt in date_range:
-            print(dt)
             temp = data[data['scan_date'].dt.date == dt]
             manpower = temp['manpower'].nlargest(np.int0((self.end_hour - self.start_hour)*0.1)+1).iloc[np.int0((self.end_hour - self.start_hour)*0.1)]
             self.dist_list.append(dist_name)
@@ -185,7 +179,6 @@ class CapacityPlanning:
         output_file = output_dir + 'Capacity Planning Weekday Summary.csv'
         daily_summary = self.daily_master_summary
         desc = daily_summary.groupby(['Distributor', 'WeekDay']).describe().reset_index()
-        # print(desc)
         desc.to_csv(output_file, index=False)
 
     def export_hourly_data(self):
@@ -196,12 +189,38 @@ class CapacityPlanning:
             main_data = pd.concat([main_data, self.dist_data[unit]])
         main_data.to_csv(output_file, index=False)
 
-    def export_serviceability(self):
-
+    def export_roaster_data(self):
         input_dir = 'vyuha/others/files/output_files/'
    
         input_file = input_dir+'{} - Capacity Planning {} Hourly Data.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
         hour_data = pd.read_csv(input_file)
+        hour_data['scan_date'] = pd.to_datetime(hour_data['scan_date'])
+        hour_data['weekday'] = hour_data['scan_date'].dt.day_name()
+        roaster_result = pd.DataFrame()
+        for day in hour_data['weekday'].unique():
+            print(day)
+            data = hour_data[hour_data['weekday'] == day]
+            roaster_result = pd.concat([roaster_result, self.export_serviceability(data, day)])
+        
+        for hour in hour_data['hour'].unique():
+            data = hour_data[hour_data['hour'] == hour]
+            result = self.export_serviceability(data, hour)
+            result['ManPower'] = result['HeadCount']
+            roaster_result = pd.concat([roaster_result, result])
+            
+
+        return roaster_result
+        
+
+    # def merge_refine_roaster_data(self):
+
+
+    def export_serviceability(self, hour_data=None, day=''):
+        if day == '':
+            input_dir = 'vyuha/others/files/output_files/'
+    
+            input_file = input_dir+'{} - Capacity Planning {} Hourly Data.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
+            hour_data = pd.read_csv(input_file)
         
         hour_data  = hour_data[hour_data['active_hour'] == 1]
         hour_data['time_slot'] = pd.to_datetime(hour_data['time_slot'])
@@ -215,18 +234,22 @@ class CapacityPlanning:
             df.sort_values(by=['time_slot'], inplace=True)
             df['manpower'] = df['manpower'].astype(int)
             for i in sorted(df['manpower'].unique()):
-                print(dist, i, (df[df['manpower'] <= i].count()[0]/df.count()[0])*100)
+                # print(dist, i, (df[df['manpower'] <= i].count()[0]/df.count()[0])*100)
                 dist_list.append(dist)
                 headcount_list.append(i)
                 success_rate_list.append((df[df['manpower'] <= i].count()[0]/df.count()[0])*100)
         summary = pd.DataFrame({'Dist':dist_list, 'HeadCount':headcount_list, 'Serviceability':success_rate_list})
         output_dir = 'vyuha/others/files/output_files/'
-        output_file = output_dir + '{} - Capacity Planning {} Serviceability.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
+        if day == '':
+            output_file = output_dir + '{} - Capacity Planning {} Serviceability.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
+        else:
+            output_file = output_dir + '{} - {} - Roaster {} Serviceability.csv'.format(day, self.start_date.strftime('%B-%y'), self.kpi)
+
         summary.to_csv(output_file, index=False)
-        self.export_serviceability_summary(summary, self.serviceability)
+        return self.export_serviceability_summary(summary, self.serviceability, day)
 
 
-    def export_serviceability_summary(self, data, serviceabilty):
+    def export_serviceability_summary(self, data, serviceabilty, day=''):
         print('serviceabilty', serviceabilty)
         data = data[data['Serviceability'] >= float(serviceabilty)].sort_values(by=['Dist','Serviceability'])
         data.drop_duplicates(subset=['Dist'], inplace=True)
@@ -235,12 +258,15 @@ class CapacityPlanning:
         operating_hours = self.operating_hours.copy()
         operating_hours.rename(columns={'Distributors':'Dist'}, inplace=True)
         data = data.merge(operating_hours, on='Dist', how='left', suffixes=['', ''])
-        data['duration'] = data['end_hour'] - data['start_hour']
-        data['ManPower'] = (data['duration']/8)*data['HeadCount']
+        # data['duration'] = data['end_hour'] - data['start_hour']
+        data['ManPower'] = data['shift_factor']*data['HeadCount']
         output_dir = 'vyuha/others/files/output_files/'
-        output_file = output_dir + '{} - {} - Service Level Result.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
-        data.to_csv(output_file, index=False)
-
+        if day == '':
+            output_file = output_dir + '{} - {} - Service Level Result.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
+            data.to_csv(output_file, index=False)
+        else:
+            data['Day/Hour'] = day
+            return data
 
     def fetch_tableau_data(self):
         with server.auth.sign_in(tableau_auth):
@@ -258,9 +284,9 @@ class CapacityPlanning:
             all_views, pagination_item = server.views.get(req_option)    
             if not all_views:
                 raise LookupError("View with the specified name was not found.")
-            print(all_views)
+            # print(all_views)
             view_item = all_views[0]
-            print(view_item)
+            # print(view_item)
             csv_req_option = TSC.CSVRequestOptions()
             server.views.populate_csv(view_item, csv_req_option)
             
@@ -278,7 +304,7 @@ class CapacityPlanning:
 
         v2_capacity_planning = None
         for capacity_csv in os.listdir('vyuha/others/files/output_files/'):
-            if 'Result' not in capacity_csv:
+            if 'Result' not in capacity_csv or 'Roaster' in capacity_csv:
                 continue
 
             capacity_v2_df = pd.read_csv('vyuha/others/files/output_files/{}'.format(capacity_csv))
@@ -326,8 +352,8 @@ class CapacityPlanning:
             final_data.loc[~final_data['KPI'].isin(['Picklist Line Items', 'Picklist Qty', 'Picklist Dispatched']), 'Ideal Cost'] = final_data['Ideal Head Count'] * final_data['Ideal Avg Salary']
             final_data = final_data[col]
             final_data['Date'] = final_data['Date'].dt.date
-            print('final_data')
-            print(final_data)
+            # print('final_data')
+            # print(final_data)
             # final_data.to_csv('Projected Output.csv', index=False)
             sq.dftoSheetsfast(driver,sheeter,final_data,sp_nam_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='Projected')
         
@@ -340,5 +366,5 @@ class CapacityPlanning:
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 print(exc_type, fname, exc_tb.tb_lineno, str(e))
         self.export_hourly_data()
-        self.export_serviceability()
-        
+        if self.roaster == 'false':
+            self.export_serviceability()

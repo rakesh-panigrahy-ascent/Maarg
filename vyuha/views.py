@@ -274,9 +274,11 @@ def calculate_capacity(request):
    total_projection_value = int(request.POST['total_projection_value'])
    v1_value = int(request.POST['v1_value'])
    v2_value = int(request.POST['v2_value'])
+   roaster = request.POST['roaster']
    
    serviceability = float(request.POST['serviceability'])
    split_hour = int(request.POST['split_hour'])
+   roaster_result = pd.DataFrame()
    for kpi in ['Picking', 'Checking', 'Dispatch']:
       if kpi == 'Picking':
          kpi_name = 'total_line_items'
@@ -329,13 +331,16 @@ def calculate_capacity(request):
          last_date = current_date + relativedelta(months=1) - timedelta(days=1)
          print(kpi_name)
          print(current_date, last_date)
-         print(type(current_date))
-         cp = CapacityPlanning(final_data, current_date, last_date,  capacity, start_hour, end_hour, kpi_name, split_hour, kpi, serviceability, total_projection_value, v1_value, v2_value)
+         cp = CapacityPlanning(final_data, current_date, last_date,  capacity, start_hour, end_hour, kpi_name, split_hour, kpi, serviceability, total_projection_value, v1_value, v2_value, roaster)
          cp.start()
          current_date += relativedelta(months=1)
-   cp.fetch_tableau_data()
-   cp.export_final_data(start_date, end_date)
-
+   if roaster == 'true':
+      roaster = Roaster()
+      roaster.start()
+   else:
+      cp.fetch_tableau_data()
+      cp.export_final_data(start_date, end_date)
+   
 
    
 

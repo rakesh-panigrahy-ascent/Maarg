@@ -87,10 +87,16 @@
             <label class="form-check-label" for="flexSwitchCheckDefault">2 Hours</label>
           </div>
         </div>
-        <div class='col-2'>
+        <div class='col-3'>
           <div class="form-check form-switch form-control-lg" title="Calculate Projection">
             <input class="form-check-input" type="checkbox" role="switch" id="project">
             <label class="form-check-label" for="flexSwitchCheckDefault">Project</label>
+          </div>
+        </div>
+        <div class='col-4'>
+          <div class="form-check form-switch form-control-lg" title="Calculate Daily/Hourly Man Power">
+            <input class="form-check-input" type="checkbox" role="switch" id="roaster_plan">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Roaster Plan</label>
           </div>
         </div>
       </div>
@@ -99,6 +105,7 @@
         <br>
         <button type="button" class="btn btn-success" id='calculate_capacity'>Calculate <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></button>
         <button type="button" class="btn btn-success" id='get_capacity_data'>Get Capacity Data</span></button>
+        <button type="button" class="btn btn-danger" id='clear_capacity_data'>Clear Data</span></button>
       </div>
       </div>
       <div class="col-4">
