@@ -435,6 +435,7 @@ class OpsMIS:
 
     def merge_sheets(self):
         sheets = os.listdir(os.path.join(os.path.dirname(__file__))+'/mis/output_files/')
+        # sheets = sheets.append('Extracted Warehouse Area Sheet.csv')
         main_file = None
         for sheet in sheets:
             print('Sheet Name: {}'.format(sheet))
@@ -447,6 +448,8 @@ class OpsMIS:
                     main_file = df
                 else:
                     if 'warehouse' in sheet.lower():
+                        # inputfile = os.path.join(os.path.dirname(__file__))+'/mis/input_files/{}'.format(sheet)
+                        # df = pd.read_csv(inputfile)
                         main_file = main_file.merge(df,on=['unit_name'], how='outer')
                     else:
                         main_file = main_file.merge(df,on=['unit_name','month'], how='outer')
@@ -704,7 +707,7 @@ class OpsMIS:
         # final_df['month'] = pd.to_datetime(final_df['month'])
         # final_df['month'] = final_df['month'].dt.strftime('%Y-%d-%m')  
         # print(type(final_df['month']),final_df['month'])
-        month_list = ['2022-04-01','2022-05-01','2022-06-01','2022-07-01','2022-08-01','2022-08-01']
+        month_list = ['2022-04-01','2022-05-01','2022-06-01','2022-07-01','2022-08-01','2022-09-01','2022-10-01','2022-11-01','2022-12-01','2023-01-01','2023-02-01','2023-03-01']
         final_df = final_df[final_df['month'].isin(month_list)]
         # Replace column value
         final_df.replace([np.inf, -np.inf], 0, inplace=True)
