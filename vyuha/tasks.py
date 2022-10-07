@@ -4,6 +4,7 @@ from celery import shared_task
 
 from vyuha.distance_matrix.calculate_distance_matrix_v2 import *
 from vyuha.distance_matrix.cluster import *
+import vyuha.others.ops_mis_sheeter as oms
 
 app = Celery('tasks', backend='amqp', broker='amqp://')
 
@@ -25,3 +26,7 @@ def start_cluster_process(unit_name, sales_value_benchmark=45000, distance_bench
     cl.start()
     cl.export_summary()
     cl.export_reports()
+
+@app.task
+def make_mis_final_sheet():
+    oms.main()

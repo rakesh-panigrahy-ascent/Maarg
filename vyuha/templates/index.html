@@ -39,7 +39,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                             <li><a class="dropdown-item" href="capacity_planning">Capacity Planning</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="ops_mis">Operation MIS</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -295,6 +295,33 @@ $(document).ready(function(){
                 }
             });
     
+        });
+
+    $('#submit_mis').click(function(){
+        file_count = document.getElementById('mis_zip').files.length
+        if(file_count == 0){
+            alert('Input the mis zip file !')
+            return false
+        }
+        for (var x = 0; x < file_count; x++) {
+            form_data.append("file", document.getElementById('mis_zip').files[x]);
+        }
+        
+        $.ajax({
+            url: 'build_mis',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            type: 'post',
+            success: function (response) {
+                alert(response.data)
+            },
+            error: function (response) {
+                alert(response.data);
+            }
+        });
         });
 
     $('#start_dbscan').click(function(){

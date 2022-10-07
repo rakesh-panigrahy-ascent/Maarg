@@ -1,0 +1,74 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<div class='container'>
+  <br /><br />
+
+  <div class="row">
+    <div class='col-8'>
+        <h5>Idhar Se Alu Dalunga Udhar Se Sona Niklega</h5>
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Upload MIS ZIP</label>
+            <input class="form-control" type="file" id="mis_zip">
+        </div>
+      
+        <button type="button" class="btn btn-success" id='submit_mis'>Submit<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></button>
+        <button type="button" class="btn btn-danger" id='clear_mis_data'>Clear Data</span></button>
+      
+    </div>
+      <!-- <div class="col-4">
+        <br>
+        <div class="input-group mb-3">
+          <span class="input-group-text">Download</span>
+          <select class="form-select form-select-sm" id="download_result" aria-label=".form-select-sm example">
+            <option selected>Select</option>
+            {% for file in output_files %}
+            <option value="{{file}}">{{file}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div> -->
+    </div>
+    <br><br>
+  </div>
+
+
+
+  <!-- Projection Modal -->
+  <div class="modal fade" id="projection_input" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Project Man Power</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Net Revenue</label>
+            <input class="form-control" type="text" id="net_revenue" placeholder='100000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Inter Company</label>
+            <input class="form-control" type="text" id="intercompany" placeholder='10000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Pharma Intercompany PL</label>
+            <input class="form-control" type="text" id="pl" placeholder='10000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">Liquidation</label>
+            <input class="form-control" type="text" id="liquidation" placeholder='10000000' value= 0>
+          </div>
+          <div class="mb-3">
+            <label for="formFile" class="form-label">JIT</label>
+            <input class="form-control" type="text" id="jit" placeholder='10000000' value= 0>
+          </div>
+        </div>
+        <div class="modal-footer">
+            {% comment %} <button type="button" class="btn btn-primary" id="start_dbscan">GO</button> {% endcomment %}
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock body %}

@@ -18,5 +18,7 @@ urlpatterns = [
     path('capacity_planning', views.capacity_planning, name='capacity_planning'),
     path('calculate_capacity', views.calculate_capacity, name='calculate_capacity'),
     path('download_result', views.download_result, name='download_result'),
-    path('get_capacity_data', views.get_capacity_data, name='get_capacity_data')
+    path('get_capacity_data', views.get_capacity_data, name='get_capacity_data'),
+    path('ops_mis', views.ops_mis, name='ops_mis'),
+    path('build_mis', views.build_mis, name='build_mis')
 ]

@@ -17,6 +17,9 @@ from vyuha.distance_matrix.cluster import *
 import vyuha.sheetioQuicks as sq
 from vyuha.others.capacity_planning import *
 from dateutil.relativedelta import relativedelta
+import zipfile
+from vyuha.others.ops_mis_consolidater import *
+import vyuha.others.ops_mis_sheeter as oms
 
 driver,sheeter = sq.apiconnect()
 
@@ -235,8 +238,8 @@ def calculate_distance(request):
 
    return JsonResponse(resp)
 
-def handle_uploaded_file(f, filename):
-    with open('vyuha/distance_matrix/input_files/{}'.format(filename), 'wb+') as destination:
+def handle_uploaded_file(f, filename, path='vyuha/distance_matrix/input_files/'):
+    with open('{}{}'.format(path, filename), 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
@@ -383,4 +386,55 @@ def get_capacity_data(request):
    input_file = input_dir+'Capacity Planning.csv'
    df.to_csv(input_file, index=False)
    resp = {'data':'Imported Data!'}
+   return JsonResponse(resp)
+
+
+def ops_mis(request):
+   output_dir = 'vyuha/others/mis/output_files/'
+   output_files = os.listdir(output_dir)
+   output_files = [x for x in output_files if '.csv' in x]
+   return render(request, 'ops_mis.html', {'output_files':output_files})
+
+def build_mis(request):
+   
+   miszip = 'MIS.zip'
+   path = 'vyuha/others/mis/input_files/'
+   path_to_zip_file = path+miszip
+   try:
+      handle_uploaded_file(request.FILES['file'], miszip, path=path)
+   except Exception as e:
+      print('No File Uploaded !', str(e))
+
+   
+   with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+      zip_ref.extractall(path)
+   
+   #Generate MIS Key File
+   try:
+      opsmis = OpsMIS()
+      opsmis.start_pipeline()
+   except Exception as e:
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print('Unable to generate mis key file !')
+      print(exc_type, fname, exc_tb.tb_lineno, str(e))
+      resp = {'data':'Unable to generate key file !...'}
+      return JsonResponse(resp)
+
+   #Generate MIS Final Sheet
+   try:
+      if PROD == True:
+         result = make_mis_final_sheet.delay()
+      else:
+         result = make_mis_final_sheet()
+   except Exception as e:
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print('Unable to generate mis final sheet !')
+      print(exc_type, fname, exc_tb.tb_lineno, str(e))
+
+
+   
+
+   resp = {'data':'Building in progress...'}
    return JsonResponse(resp)
