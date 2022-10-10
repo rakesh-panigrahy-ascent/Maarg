@@ -9,6 +9,7 @@ import numpy as np
 from dateutil.relativedelta import relativedelta
 import calendar
 from calendar import monthrange
+import shutil
 
 driver,sheeter = sq.apiconnect()
 
@@ -435,21 +436,19 @@ class OpsMIS:
 
     def merge_sheets(self):
         sheets = os.listdir(os.path.join(os.path.dirname(__file__))+'/mis/output_files/')
-        # sheets = sheets.append('Extracted Warehouse Area Sheet.csv')
         main_file = None
         for sheet in sheets:
             print('Sheet Name: {}'.format(sheet))
             try:
                 if 'Extracted' not in sheet:
                     continue
+
                 inputfile = os.path.join(os.path.dirname(__file__))+'/mis/output_files/{}'.format(sheet)
                 df = pd.read_csv(inputfile)
                 if main_file is None:
                     main_file = df
                 else:
                     if 'warehouse' in sheet.lower():
-                        # inputfile = os.path.join(os.path.dirname(__file__))+'/mis/input_files/{}'.format(sheet)
-                        # df = pd.read_csv(inputfile)
                         main_file = main_file.merge(df,on=['unit_name'], how='outer')
                     else:
                         main_file = main_file.merge(df,on=['unit_name','month'], how='outer')
@@ -720,6 +719,7 @@ class OpsMIS:
         self.get_query_kpis()
         self.logistics_last_mile_source()
         self.logistics_mid_mile_source()
+        shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
         self.merge_sheets()
 
 # if __name__ == '__main__':
