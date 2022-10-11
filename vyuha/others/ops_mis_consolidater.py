@@ -10,6 +10,8 @@ from dateutil.relativedelta import relativedelta
 import calendar
 from calendar import monthrange
 import shutil
+import logging
+logging.basicConfig(filename='vyuha/distance_matrix/log/distance_matrix.log', level=logging.INFO)
 
 driver,sheeter = sq.apiconnect()
 
@@ -126,6 +128,7 @@ class OpsMIS:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 print(exc_type, fname, exc_tb.tb_lineno, str(e))
+                logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
                 self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
                 self.status = False
 
@@ -304,6 +307,7 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
             self.status = False
     
@@ -356,6 +360,7 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
             self.status = False
 
@@ -411,6 +416,7 @@ class OpsMIS:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                     print(exc_type, fname, exc_tb.tb_lineno, str(e))
+                    logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
 
             unit_map_copy = unit_map[['Logistics', 'OPS MIS']]
             unit_map_copy.drop_duplicates(subset=['Logistics'], inplace=True)
@@ -428,6 +434,7 @@ class OpsMIS:
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.status = False
 
     def logistics_mid_mile_source(self):
@@ -469,6 +476,7 @@ class OpsMIS:
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.status = False
 
 
@@ -495,6 +503,7 @@ class OpsMIS:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                     print(exc_type, fname, exc_tb.tb_lineno, str(e))
+                    logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
 
             # print(main_file.columns.tolist())
             main_file = self.calculate_kpis(main_file)
@@ -510,6 +519,7 @@ class OpsMIS:
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.status = False
 
     def calculate_kpis(self, all_kpis_df):
@@ -744,6 +754,7 @@ class OpsMIS:
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
             self.status = False
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
         return all_kpis_df
     
     def generate_key_file(self, final_df):
@@ -769,6 +780,7 @@ class OpsMIS:
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
             self.status = False
 
     def start_pipeline(self):
@@ -782,6 +794,7 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
         try:
             shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
         except:
