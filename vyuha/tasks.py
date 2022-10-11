@@ -29,4 +29,10 @@ def start_cluster_process(unit_name, sales_value_benchmark=45000, distance_bench
 
 @app.task
 def make_mis_final_sheet():
-    oms.main()
+    try:
+        oms.main()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print('Unable to generate mis final sheet !')
+        print(exc_type, fname, exc_tb.tb_lineno, str(e))

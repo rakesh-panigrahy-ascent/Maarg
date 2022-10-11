@@ -1,6 +1,5 @@
 import os
 import sys
-from turtle import bgcolor
 
 from vyuha.mailer.common_mailer import send_mail
 sys.path.insert(0, os.getcwd())
