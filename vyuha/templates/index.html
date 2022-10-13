@@ -479,7 +479,7 @@ $(document).ready(function(){
 
     $("#calculate_distance_btn").click(function(){
         var form_data = new FormData();
-        var ins = document.getElementById('coordinate_file').files.length;
+        //var ins = document.getElementById('coordinate_file').files.length;
         var unitname = $('#unit_name').val()
         var state = $('#state').val()
 
@@ -493,7 +493,7 @@ $(document).ready(function(){
             return false
         }
 
-        file_count = document.getElementById('coordinate_file').files.length
+        /*file_count = document.getElementById('coordinate_file').files.length
         if (file_count < 1){
             alert('Kindly upload the geo coordinate file !')
             return false
@@ -501,7 +501,7 @@ $(document).ready(function(){
 
         for (var x = 0; x < ins; x++) {
             form_data.append("file", document.getElementById('coordinate_file').files[x]);
-        }
+        }*/
 
         form_data.append('unitname', unitname)
         form_data.append('state', state);

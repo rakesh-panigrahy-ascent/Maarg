@@ -211,16 +211,29 @@ def calculate_distance(request):
 
    current_osm_file = get_current_osm_file().split('/')[1].split('-')[0].title()
 
-   ors_engine_status = check_ors_status()
-   
-   if ors_engine_status != 'ready':
-      resp = {'data': 'ORS Engine Status: {}'.format(ors_engine_status)}
-      return JsonResponse(resp)
-
    if current_osm_file != state:
       change_osm_file(filename=state.lower())
 
-   handle_uploaded_file(request.FILES['file'], output_filename)
+   ors_engine_status = check_ors_status(120)
+   print('ors_engine_status', ors_engine_status)
+   if ors_engine_status != 'ready':
+      resp = {'data': 'ORS Engine Status: {}'.format(ors_engine_status)}
+      return JsonResponse(resp)
+   
+   tableau_data_path = 'vyuha/distance_matrix/input_files/coordinates.csv'
+   output_file_path = 'vyuha/distance_matrix/input_files/'+output_filename
+   fetch_tableau_data(output_file = tableau_data_path)
+   coordinate_file = pd.read_csv(tableau_data_path)
+   coordinate_file.rename(columns={'Median latitude':'latitude', 'Median longitude':'longitude'}, inplace=True)
+   coordinate_file = coordinate_file[coordinate_file['Distributor Name'] == unit_name]
+   coordinate_file = coordinate_file.loc[:, ['distributor_id', 'Distributor Name', 'Customer Code', 'Customer Name', 'latitude', 'longitude']]
+   print(coordinate_file)
+   coordinate_file.to_csv(output_file_path, index=False)
+
+   # handle_uploaded_file(request.FILES['file'], output_filename)
+   resp = {'data':'Your task is in queuee...'}
+
+   return JsonResponse(resp)
    
    input_file = 'vyuha/distance_matrix/input_files/{}'.format(output_filename)
    df = pd.read_csv(input_file)

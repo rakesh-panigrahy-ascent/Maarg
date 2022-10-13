@@ -3,7 +3,7 @@ from math import dist
 from operator import index
 from sqlalchemy import create_engine, text
 import pandas as pd
-
+from Maarg.settings import *
 import vyuha.postgres_conn as pg
 
 # # #
@@ -80,3 +80,34 @@ def exceltodl3(df, tablename, todelete=True, pagesize=10000, conditions={}):
 
     db.execute_vals(query=f'insert into {tablename} values %s', data=df, pagesize=pagesize)
     print('data inserted')
+
+
+def fetch_tableau_data(workbook_id='0df39510-4953-4940-b693-36466cbb5343', sheet_name='Coordinates Dashabord', output_file='output.csv'):
+    with server.auth.sign_in(tableau_auth):
+        req_option = TSC.RequestOptions()
+        workbook = server.workbooks.get_by_id(workbook_id)
+        server.workbooks.populate_views(workbook)
+        req_option.filter.add(
+            TSC.Filter(
+                TSC.RequestOptions.Field.Name,
+                TSC.RequestOptions.Operator.Equals,
+                sheet_name
+            )
+        )
+        
+        all_views, pagination_item = server.views.get(req_option)    
+        if not all_views:
+            raise LookupError("View with the specified name was not found.")
+        # print(all_views)
+        view_item = all_views[0]
+        # print(view_item)
+        csv_req_option = TSC.CSVRequestOptions()
+        server.views.populate_csv(view_item, csv_req_option)
+        
+        with open(output_file, 'wb') as f:
+            f.write(b''.join(view_item.csv))
+    
+def get_workbook_list():
+    with server.auth.sign_in(tableau_auth):
+        for wb in TSC.Pager(server.workbooks):
+            print(wb.name, wb.id)
