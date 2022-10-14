@@ -1,13 +1,25 @@
+import time
 import os
 import json
+import sys
 import subprocess
 from time import sleep, time
 from urllib import request
 from Maarg.settings import OSM_CONFIG_JSON_PATH, OSM_DATA_DIR, CONTAINER_ID
 import requests
 import time
+import docker
 import logging
 logging.basicConfig(filename='vyuha/distance_matrix/log/distance_matrix.log', level=logging.INFO)
+
+try:
+    client = docker.from_env()
+except Exception as e:
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]  
+    print(exc_type, fname, exc_tb.tb_lineno, str(e))
+
+
 
 def change_osm_file(filename='odisha'):
     new_file = 'data/{}-latest.osm.pbf'.format(filename)
@@ -27,14 +39,26 @@ def change_osm_file(filename='odisha'):
 
 def start_container():
     logging.info('Starting Container')
-    cmd = 'docker container start {}'.format(CONTAINER_ID)
-    subprocess.run(cmd)
+    # cmd = 'docker container start {}'.format(CONTAINER_ID)
+    # subprocess.run(cmd)
+    container = client.containers.get(CONTAINER_ID)
+    container.start()
     return None
 
 def stop_container():
     logging.info('Stoping Container')
-    cmd = 'docker container stop {}'.format(CONTAINER_ID)
-    subprocess.run(cmd)
+    # cmd = 'docker container stop {}'.format(CONTAINER_ID)
+    # subprocess.run(cmd)
+    container = client.containers.get(CONTAINER_ID)
+    container.stop()
+    return None
+
+def restart_container():
+    logging.info('Restarting Container')
+    # cmd = 'docker container stop {}'.format(CONTAINER_ID)
+    # subprocess.run(cmd)
+    container = client.containers.get(CONTAINER_ID)
+    container.restart()
     return None
 
 def get_osm_file_list():
@@ -54,8 +78,8 @@ def get_current_osm_file():
 
 
 def check_ors_status(timer=5):
-    start_time = time()
-    end_time = time()
+    start_time = time.time()
+    end_time = time.time()
     duration = end_time - start_time
     while duration <= timer:
         print('Duration: {} seconds', duration)
@@ -70,5 +94,5 @@ def check_ors_status(timer=5):
             status = 'ORS Engine Down! Kindly start and try again !'
         end_time = time.time()
         duration = end_time - start_time
-        sleep(5)
+        time.sleep(5)
     return status
