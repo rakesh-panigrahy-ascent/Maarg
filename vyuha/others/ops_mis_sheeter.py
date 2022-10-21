@@ -73,6 +73,7 @@ def main():
             # Write KPI
             if kpi[6] != None:
                 cell_format = json.loads(kpi[6])
+                print(cell_format)
                 cell_format = workbook.add_format(cell_format)
             else:
                 cell_format = {}
@@ -118,7 +119,12 @@ def main():
                 while formula_target_col <= max_date_col:
                     refered_formula_cell = xl_rowcol_to_cell(key_start_row, formula_target_col)+':'+xl_rowcol_to_cell(key_end_row, formula_target_col)
                     formula_type = kpi[5]
+                    # if ('percentage' in kpi[1].lower()) or ('%' in kpi[1]):
+                    #     formulae = '{}({}({}({})*100,2),"%")'.format('CONCATENATE','ROUND',formula_type, refered_formula_cell)
+                    # else:
+                    #     formulae = '{}({}({}),2)'.format('ROUND',formula_type, refered_formula_cell)
                     formulae = '{}({})'.format(formula_type, refered_formula_cell)
+
                     worksheet.write_formula(row=kpi_row, col=formula_target_col, formula=formulae, cell_format=bold)
                     formula_target_col += 1
                 
@@ -164,6 +170,10 @@ class DataFill:
                 # print(type(self.consolidated_sheet['month']),self.consolidated_sheet['month'])
                 print(target_date,target_kpi)
                 result = self.consolidated_sheet[(self.consolidated_sheet['key']==target_kpi) & (self.consolidated_sheet['month']==str(target_date))].iloc[:,3].values[0]
+                # if ('percentage' in target_kpi.lower()) or ('%' in target_kpi):
+                #     result = round((result*100),2)
+                # else:
+                #     result = round(result, 2)
                 print(result)
             else:
                 result = self.message
