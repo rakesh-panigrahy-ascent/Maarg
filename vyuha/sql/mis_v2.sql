@@ -477,22 +477,26 @@ where
 group by 1,2,3
 order by 1,2,3)
 union
-(--Intransit breakage
+(--Intransit breakage (retail)
 select
 	ndi.n_distributor_id "dist_id",
 	dn.name dist_name,
 	date_trunc('month', sp2.vdt)::date as dt,
-	'Intransit breakage' kpi_name,
+	'Intransit breakage (Retail)' kpi_name,
 	sum(sp2.netamt) kpi_value
 from ahwspl__ahwspl_de__easysol.salepurchase2 sp2
 left join adhoc.namespace_distributor_id ndi on ndi."namespace" = sp2.skull_namespace 
 left join adhoc.distributor_name dn on ndi.n_distributor_id = dn.distributor_id 
+left join level1.act_mst am 
+	on am.c_code = sp2.acno 
+	and am.n_distributor_id = ndi.n_distributor_id 
 where 
 	date(sp2.vdt) between '2022-01-01' and current_date - 1
 	and sp2.vtype in ('BC','BE')
 	and sp2.skull_opcode <> 'D'
 	and sp2.betype = 'B'
 --	and ndi.n_distributor_id in (70, 71, 6)
+	and (am.consol_category_fin is null or am.consol_category_fin = 'RETAIL')
 group by 1,2,3
 order by 1,2,3)
 union
@@ -572,13 +576,12 @@ where
 group by 1,2,3
 order by 1,2,3)
 union
-(--Percentage of non-moving items
-select t1.dist_id, t1.dist_name, date_trunc('month', t1."Period")::date as dt, 'Percentage of Non-moving item' kpi_name, (t1.day_end_stock/t2.total_value)*100 kpi_value
-from (select 
+(--Value of non-moving items
+select 
 		esde.distributor_id "dist_id",
 		dn."name" "dist_name",
-		caf.category_fms category,
-		esde.sync_date "Period",  
+        date_trunc('month', esde.sync_date)::date as dt,
+		'Value of Non-moving item' "kpi_name",
 		sum(esde.cost * esde.bqty) day_end_stock
 	from adhoc.easysol_stock_day_end esde  
 	left join adhoc.distributor_name dn on esde.distributor_id = dn.distributor_id
@@ -586,21 +589,6 @@ from (select
 	where 
 		date(esde.sync_date) between '2022-01-01' and current_date - 1
 		and date_part('d', esde.sync_date) = 15
+        and caf.category_fms ='N'
 	group by 1,2,3,4
-	order by 2,3) t1
-left join (select 
-				esde.distributor_id "dist_id",
-				dn."name" "dist_name",
-				esde.sync_date "Period",  
-				sum(esde.cost * esde.bqty) total_value
-			from adhoc.easysol_stock_day_end esde  
-			left join adhoc.distributor_name dn on esde.distributor_id = dn.distributor_id
-			where 
-				date(esde.sync_date) between '2022-01-01' and current_date - 1
-				and date_part('d', esde.sync_date) = 15
-			group by 1,2,3
-			order by 2,3) t2
-	on t1.dist_id = t2.dist_id and t1.dist_name = t2.dist_name and t1."Period" = t2."Period"
-where t1.category = 'N'
---and t1.dist_id in (64)
-order by 1,2,3)
+	order by 2,3)
