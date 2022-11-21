@@ -19,6 +19,7 @@ cryptography==37.0.4
 defusedxml==0.7.1
 Deprecated==1.2.13
 Django==4.0.6
+django-crontab==0.7.1
 docker==6.0.0
 et-xmlfile==1.1.0
 google-api-python-client==1.6.7
