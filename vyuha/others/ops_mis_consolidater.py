@@ -237,7 +237,7 @@ class OpsMIS:
                                                 'Net Revenue':'Net Revenue (after discuount W/o Gst)',
                                                 'Salaries & Wages':'1. Salaries & Wages',
                                                 'Purchase of Packaging Material - Polythene Bags':'3.a Polybag cost',
-                                                'Purchase of Packaging Material - Others':'3.b other packing cost ',
+                                                'Purchase of Packaging Material - Others':'3.b other packing cost',
                                                 'Electricity':'4. Electricity',
                                                 'Telephone & Internet':'5. Telephone & Internet',
                                                 'Commission expenses':'6. Commission expenses',
@@ -264,7 +264,7 @@ class OpsMIS:
                 mis_source_df['Mid mile (MIS)'] = mis_source_df['1.b Intercity cost (MIS)']
                 mis_source_df['Intercompany Sales (W/o Gst)'] = mis_source_df['Sales - Franchisee'] + mis_source_df['Sales - PE Market Place'] + mis_source_df['Sales - SupplyThis'] + mis_source_df['Sales to Aknamed'] + mis_source_df['Sales to MEDLIFE'] + mis_source_df['Sale to THREPSI'] + mis_source_df['Sales Inter Company Elimination - Cluster'] + mis_source_df['Sales Inter Company Elimination - Out of Cluster'] + mis_source_df['Sales Return - Intercompany']
                 mis_source_df['Total Operating Cost (before THEA reimbursement Deduction)'] = mis_source_df['Total Operating Cost (after THEA reimbursement Deduction)'] + mis_source_df['THEA reimbursement']
-                mis_source_df['3. Packaging Cost'] = mis_source_df['3.a Polybag cost'] + mis_source_df['3.b other packing cost ']
+                mis_source_df['3. Packaging Cost'] = mis_source_df['3.a Polybag cost'] + mis_source_df['3.b other packing cost']
                 mis_source_df['Others'] = mis_source_df['AMC (Software)'] + mis_source_df['Audit Fees'] + mis_source_df['Bank Charges'] + mis_source_df['Books & Periodicals'] + mis_source_df['Computer Maintenance']+ mis_source_df['Generator Charges'] + mis_source_df['House Keeping'] + mis_source_df['Insurance Charges - Stock'] + mis_source_df['Legal Charges'] + mis_source_df['Loading & Unloading Charges'] + mis_source_df['Office Expenses'] + mis_source_df['Pooja Expenses'] + mis_source_df['Postage & Courier'] + mis_source_df['Professional Charges'] + mis_source_df['Rates & Taxes'] + mis_source_df['Rent - Guest House'] + mis_source_df['Repairs & Maintenance'] + mis_source_df['Sales Promotion'] + mis_source_df['Security Charges'] + mis_source_df['Travelling & Conveyance'] + mis_source_df['Vehicle Running & Maintenance'] + mis_source_df['Water Charges'] 
                 # mis_source_df['1. Total Logistics Cost (MIS)'] = mis_source_df['6. Commission expenses'] + mis_source_df['7. Warehouse Rent']
                 mis_source_df['dist_name'] = mis_source_sheet_names[j]
@@ -284,7 +284,7 @@ class OpsMIS:
                 mis_source_df['unit_name'].replace({'VPIM - JP':'VPIM','VPIM - PH':'VPIM'},inplace = True)
 
                 mis_source_df = mis_source_df[['unit_name','month','Gross Sales (W/o Gst)','1.b Intercity cost (MIS)','Net Revenue (after discuount W/o Gst)',
-                        '1. Salaries & Wages','Mid mile (MIS)','3.a Polybag cost','3.b other packing cost ',
+                        '1. Salaries & Wages','Mid mile (MIS)','3.a Polybag cost','3.b other packing cost',
                         '4. Electricity','5. Telephone & Internet','6. Commission expenses','7. Warehouse Rent',
                         '8. Cash Discounts to Retailers','9. Other Operating Expenses','9.a. Printing Cost','9.b. Paper Cost',
                         '9.c. other stationary Cost','10. Other income','THEA reimbursement',
@@ -521,6 +521,7 @@ class OpsMIS:
 
     def calculate_kpis(self, all_kpis_df):
         try:
+            print(type(all_kpis_df))
             # print(all_kpis_df.columns.tolist())
             # Logistics kpis
             all_kpis_df['Total Salary--Delivery'] = all_kpis_df['Total Salary--Delivery'] / 1000000
@@ -639,7 +640,7 @@ class OpsMIS:
             all_kpis_df['1.k Overall Non - Operations cost per order'] = all_kpis_df['Total Salary--Overall Non - Ops']/all_kpis_df['Billed orders (Total)']*1000000
 
             all_kpis_df['3.a Polybag cost cost per order'] = all_kpis_df['3.a Polybag cost']/all_kpis_df['Billed orders (Total)']*1000000
-            all_kpis_df['3.b other packing cost cost per order'] = all_kpis_df['3.b other packing cost ']/all_kpis_df['Billed orders (Total)']*1000000
+            all_kpis_df['3.b other packing cost cost per order'] = all_kpis_df['3.b other packing cost']/all_kpis_df['Billed orders (Total)']*1000000
 
 
             all_kpis_df['1.a.i Inward % of Net Revenue'] = all_kpis_df['Total Salary--Inward']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
@@ -661,7 +662,7 @@ class OpsMIS:
 
 
             all_kpis_df['3.a Polybag cost Cost as a % of Net Revenue'] = all_kpis_df['3.a Polybag cost']/all_kpis_df['Billed orders (Total)']
-            all_kpis_df['3.b other packing cost Cost as a % of Net Revenue'] = all_kpis_df['3.b other packing cost ']/all_kpis_df['Billed orders (Total)']
+            all_kpis_df['3.b other packing cost Cost as a % of Net Revenue'] = all_kpis_df['3.b other packing cost']/all_kpis_df['Billed orders (Total)']
 
             
             # all_kpis_df['Vehicle running & mainteinance cost'] = all_kpis_df['1.a.ii Vehicle running & mainteinance cost (Actual)']
@@ -671,27 +672,27 @@ class OpsMIS:
             # all_kpis_df['1.b Intercity cost (MIS) as a % of Net Revenue'] = all_kpis_df['1.b Intercity cost (MIS)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
             # all_kpis_df['2.Total Logistics Cost (Actual) as a % of Net Revenue'] = all_kpis_df['2. Total Logistics Cost (Actual)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
             
-            all_kpis_df['Cost per man per month Inward'] = all_kpis_df['Total Salary--Inward'] / all_kpis_df['Present Head Count--Inward']
-            all_kpis_df['Cost per man per month Store'] = all_kpis_df['Total Salary--Store'] / all_kpis_df['Present Head Count--Store']
-            all_kpis_df['Cost per man per month Checking'] = all_kpis_df['Total Salary--Checking'] / all_kpis_df['Present Head Count--Checking']
-            all_kpis_df['Cost per man per month Dispatch'] = all_kpis_df['Total Salary--Dispatch'] / all_kpis_df['Present Head Count--Dispatch']
-            all_kpis_df['Cost per man per month Audit and refilling'] = all_kpis_df['Total Salary--Audit & Refilling'] / all_kpis_df['Present Head Count--Audit & Refilling']
-            all_kpis_df['Cost per man per month Expiry'] = all_kpis_df['Total Salary--Expiry'] / all_kpis_df['Present Head Count--Expiry']
-            all_kpis_df['Cost per man per month Sales return'] = all_kpis_df['Total Salary--Sales Return'] / all_kpis_df['Present Head Count--Sales Return']
-            all_kpis_df['Cost per man per month Overall operations'] = all_kpis_df['Total Salary--Overall Operation'] / all_kpis_df['Present Head Count--Overall Operation']
-            all_kpis_df['Cost per man per month Total Operations'] = all_kpis_df['Cost per man per month Inward'] + all_kpis_df['Cost per man per month Store'] + all_kpis_df['Cost per man per month Checking'] + all_kpis_df['Cost per man per month Dispatch'] + all_kpis_df['Cost per man per month Audit and refilling'] + all_kpis_df['Cost per man per month Expiry'] + all_kpis_df['Cost per man per month Sales return'] + all_kpis_df['Cost per man per month Overall operations']
+            all_kpis_df['Cost per man per month Inward'] = all_kpis_df['Total Salary--Inward'] / all_kpis_df['Present Head Count--Inward']*1000000
+            all_kpis_df['Cost per man per month Store'] = all_kpis_df['Total Salary--Store'] / all_kpis_df['Present Head Count--Store']*1000000
+            all_kpis_df['Cost per man per month Checking'] = all_kpis_df['Total Salary--Checking'] / all_kpis_df['Present Head Count--Checking']*1000000
+            all_kpis_df['Cost per man per month Dispatch'] = all_kpis_df['Total Salary--Dispatch'] / all_kpis_df['Present Head Count--Dispatch']*1000000
+            all_kpis_df['Cost per man per month Audit and refilling'] = all_kpis_df['Total Salary--Audit & Refilling'] / all_kpis_df['Present Head Count--Audit & Refilling']*1000000
+            all_kpis_df['Cost per man per month Expiry'] = all_kpis_df['Total Salary--Expiry'] / all_kpis_df['Present Head Count--Expiry']*1000000
+            all_kpis_df['Cost per man per month Sales return'] = all_kpis_df['Total Salary--Sales Return'] / all_kpis_df['Present Head Count--Sales Return']*1000000
+            all_kpis_df['Cost per man per month Overall operations'] = all_kpis_df['Total Salary--Overall Operation'] / all_kpis_df['Present Head Count--Overall Operation']*1000000
+            # all_kpis_df['Cost per man per month Total Operations'] = all_kpis_df['Cost per man per month Inward'] + all_kpis_df['Cost per man per month Store'] + all_kpis_df['Cost per man per month Checking'] + all_kpis_df['Cost per man per month Dispatch'] + all_kpis_df['Cost per man per month Audit and refilling'] + all_kpis_df['Cost per man per month Expiry'] + all_kpis_df['Cost per man per month Sales return'] + all_kpis_df['Cost per man per month Overall operations']
             
-            all_kpis_df['Cost per man per month Delivery'] = all_kpis_df['Total Salary--Delivery'] / all_kpis_df['Present Head Count--Delivery']
-            all_kpis_df['Cost per man per month Admin'] = all_kpis_df['Total Salary--Admin'] / all_kpis_df['Present Head Count--Admin']
-            all_kpis_df['Cost per man per month Finance & Accounts'] = all_kpis_df['Total Salary--Finance & Accounts'] / all_kpis_df['Present Head Count--Finance & Accounts']
-            all_kpis_df['Cost per man per month Purchase'] = all_kpis_df['Total Salary--Purchase'] / all_kpis_df['Present Head Count--Purchase']
-            all_kpis_df['Cost per man per month Sales'] = all_kpis_df['Total Salary--Sales'] / all_kpis_df['Present Head Count--Sales']
-            all_kpis_df['Cost per man per month IT'] = all_kpis_df['Total Salary--IT'] / all_kpis_df['Present Head Count--IT']
-            all_kpis_df['Cost per man per month HR'] = all_kpis_df['Total Salary--HR'] / all_kpis_df['Present Head Count--HR']
-            all_kpis_df['Cost per man per month Data Analyst'] = all_kpis_df['Total Salary--Data analyst'] / all_kpis_df['Present Head Count--Data analyst']
-            all_kpis_df['Cost per man per month Overall Non-Operations'] = all_kpis_df['Total Salary--Overall Non - Ops'] / all_kpis_df['Present Head Count--Overall Non - Ops']
+            all_kpis_df['Cost per man per month Delivery'] = all_kpis_df['Total Salary--Delivery'] / all_kpis_df['Present Head Count--Delivery']*1000000
+            all_kpis_df['Cost per man per month Admin'] = all_kpis_df['Total Salary--Admin'] / all_kpis_df['Present Head Count--Admin']*1000000
+            all_kpis_df['Cost per man per month Finance & Accounts'] = all_kpis_df['Total Salary--Finance & Accounts'] / all_kpis_df['Present Head Count--Finance & Accounts']*1000000
+            all_kpis_df['Cost per man per month Purchase'] = all_kpis_df['Total Salary--Purchase'] / all_kpis_df['Present Head Count--Purchase']*1000000
+            all_kpis_df['Cost per man per month Sales'] = all_kpis_df['Total Salary--Sales'] / all_kpis_df['Present Head Count--Sales']*1000000
+            all_kpis_df['Cost per man per month IT'] = all_kpis_df['Total Salary--IT'] / all_kpis_df['Present Head Count--IT']*1000000
+            all_kpis_df['Cost per man per month HR'] = all_kpis_df['Total Salary--HR'] / all_kpis_df['Present Head Count--HR']*1000000
+            all_kpis_df['Cost per man per month Data Analyst'] = all_kpis_df['Total Salary--Data analyst'] / all_kpis_df['Present Head Count--Data analyst']*1000000
+            all_kpis_df['Cost per man per month Overall Non-Operations'] = all_kpis_df['Total Salary--Overall Non - Ops'] / all_kpis_df['Present Head Count--Overall Non - Ops']*1000000
             all_kpis_df['Total Biker headcount'] = (all_kpis_df['Present Head Count--Delivery'] + all_kpis_df['3rd Biker Headcount'])+(3 * all_kpis_df['3rd Van Headcount'])
-            all_kpis_df['Cost Per Biker Per Month'] = (all_kpis_df['Biker'] + (all_kpis_df['Van'])*3) / all_kpis_df['Total Biker headcount']
+            all_kpis_df['Cost Per Biker Per Month'] = (all_kpis_df['Biker'] + (all_kpis_df['Van'])*3) / all_kpis_df['Total Biker headcount']*1000000
             all_kpis_df['Sales Return ( At PTR after discount)'] = all_kpis_df['Sales Return ( At PTR after discount)'] / 1000000
             # all_kpis_df['Inward value ( PTS/EPR)'] = all_kpis_df['Inward value ( PTS/EPR)'] / 1000000
             all_kpis_df['Inventory value - PTS/EPR (15th of the month)'] = all_kpis_df['Inventory value - PTS/EPR (15th of the month)'] / 1000000
@@ -715,10 +716,16 @@ class OpsMIS:
             all_kpis_df[['Total Salary--Inward','Total Salary--Store','Total Salary--Checking','Total Salary--Dispatch','Total Salary--Audit & Refilling','Total Salary--Expiry','Total Salary--Sales Return','Total Salary--Overall Operation']] = all_kpis_df[['Total Salary--Inward','Total Salary--Store','Total Salary--Checking','Total Salary--Dispatch','Total Salary--Audit & Refilling','Total Salary--Expiry','Total Salary--Sales Return','Total Salary--Overall Operation']].replace(np.nan,0) 
             all_kpis_df['Ops Salaries & Wages'] = all_kpis_df['Total Salary--Inward'] + all_kpis_df['Total Salary--Store'] + all_kpis_df['Total Salary--Checking'] + all_kpis_df['Total Salary--Dispatch'] + all_kpis_df['Total Salary--Audit & Refilling'] + all_kpis_df['Total Salary--Expiry'] + all_kpis_df['Total Salary--Sales Return'] + all_kpis_df['Total Salary--Overall Operation']
             all_kpis_df['Ops Salaries & Wages as a % of Net Revenue'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
+            
+            #Replacing NaN with '0'
+            all_kpis_df[['Present Head Count--Inward', 'Present Head Count--Store', 'Present Head Count--Checking', 'Present Head Count--Dispatch', 'Present Head Count--Audit & Refilling', 'Present Head Count--Expiry', 'Present Head Count--Sales Return', 'Present Head Count--Overall Operation']] = all_kpis_df[['Present Head Count--Inward', 'Present Head Count--Store', 'Present Head Count--Checking', 'Present Head Count--Dispatch', 'Present Head Count--Audit & Refilling', 'Present Head Count--Expiry', 'Present Head Count--Sales Return', 'Present Head Count--Overall Operation']].replace(np.nan,0)
             all_kpis_df['Present Head Count Ops'] = all_kpis_df['Present Head Count--Inward'] + all_kpis_df['Present Head Count--Store'] + all_kpis_df['Present Head Count--Checking'] + all_kpis_df['Present Head Count--Dispatch'] + all_kpis_df['Present Head Count--Audit & Refilling'] + all_kpis_df['Present Head Count--Expiry'] + all_kpis_df['Present Head Count--Sales Return'] + all_kpis_df['Present Head Count--Overall Operation']
-            all_kpis_df['Cost per man per month Total Operations'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Present Head Count Ops']
+            all_kpis_df['Cost per man per month Total Operations'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Present Head Count Ops']*1000000
             all_kpis_df['Salary and wages cost per order'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Billed orders (Total)']*1000000
             
+
+            ### Calculating Percentage KPI's headers
+            # all_kpis_df['1.A Salaries & Wages as a % of Net Revenue_head'] = 
 
             #Renaming kpi's
             all_kpis_df.rename(columns = {'Working Days--Worked Mandays--Present Head Count--Admin':'Worked Mandays--Admin',
@@ -750,7 +757,7 @@ class OpsMIS:
                     'Total Salary--Delivery','Total Salary--Admin','Total Salary--Finance & Accounts','Total Salary--Purchase','Total Salary--Sales',
                     'Total Salary--IT','Total Salary--HR','Total Salary--Data analyst','Total Salary--Overall Non - Ops',
                     'Last Mile (MIS)','Mid mile (MIS)','Mid mile (Actual)','3. Packaging Cost','3.a Polybag cost',
-                    '3.b other packing cost ','4. Electricity','5. Telephone & Internet','6. Commission expenses','7. Warehouse Rent',
+                    '3.b other packing cost','4. Electricity','5. Telephone & Internet','6. Commission expenses','7. Warehouse Rent',
                     '8. Cash Discounts to Retailers','9. Other Operating Expenses','9.a. Printing Cost','9.b. Paper Cost','9.c. other stationary Cost',
                     'Others','10. Other income','THEA reimbursement','Total Operating Cost (after THEA reimbursement Deduction)',
                     'Total Operating Cost as a % of Net Revenue (before THEA reimbursement Deduction)','1.A Salaries & Wages as a % of Net Revenue',
@@ -840,24 +847,23 @@ class OpsMIS:
             self.status = False
 
     def start_pipeline(self):
-        # try:
-        #     self.extract_ops_salary_sheet()
-        #     self.get_finance_mis_source()
-        #     self.get_query_kpis()
-        #     self.logistics_last_mile_source()
-        #     self.logistics_mid_mile_source()
-        # except Exception as e:
-        #     exc_type, exc_obj, exc_tb = sys.exc_info()
-        #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        #     print(exc_type, fname, exc_tb.tb_lineno, str(e))
-        #     logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
-        # try:
-        #     shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
-        # except:
-        #     pass
+        try:
+            self.extract_ops_salary_sheet()
+            self.get_finance_mis_source()
+            self.get_query_kpis()
+            self.logistics_last_mile_source()
+            self.logistics_mid_mile_source()
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+        try:
+            shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
+        except:
+            pass
         self.merge_sheets()
 
-# if __name__ == '__main__':
-#     opsmis = OpsMIS()
-#     opsmis.start_pipeline()
-    # opsmis.merge_sheets()
+if __name__ == '__main__':
+    opsmis = OpsMIS()
+    opsmis.start_pipeline()
