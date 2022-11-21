@@ -7,6 +7,8 @@ import os
 import logging
 from datetime import datetime
 from celery import Celery
+from vyuha.distance_matrix.config_ors_engine import *
+from vyuha.tasks import *
 
 warnings.filterwarnings("ignore")
 
@@ -54,3 +56,35 @@ class distance_matrix:
         else:
             distance_in_meter = 'NA'
         return distance_in_meter
+
+    def calculate_auto_distance_matrix(self, unit_name, state):
+        output_filename = unit_name+'_coordinates.csv'
+        current_osm_file = get_current_osm_file().split('/')[1].split('-')[0].title()
+
+        if current_osm_file != state:
+            change_osm_file(filename=state.lower())
+
+        ors_engine_status = check_ors_status(1800)
+        print('ors_engine_status', ors_engine_status)
+
+        if ors_engine_status != 'ready':
+            resp = {'data': 'ORS Engine Status: {}'.format(ors_engine_status)}
+            return resp
+        
+        tableau_data_path = 'vyuha/distance_matrix/input_files/coordinates.csv'
+        output_file_path = 'vyuha/distance_matrix/input_files/'+output_filename
+        coordinate_file = pd.read_csv(tableau_data_path)
+        coordinate_file.rename(columns={'Median latitude':'latitude', 'Median longitude':'longitude'}, inplace=True)
+        coordinate_file = coordinate_file[coordinate_file['Distributor Name'] == unit_name]
+        coordinate_file = coordinate_file.loc[:, ['distributor_id', 'Distributor Name', 'Customer Code', 'Customer Name', 'latitude', 'longitude']]
+        print(coordinate_file)
+        coordinate_file.to_csv(output_file_path, index=False)
+        
+        df = coordinate_file.to_json()
+        if PROD == True:
+            result = start_distance_matrix_calculation.delay(df, unit_name)
+        else:
+            result = start_distance_matrix_calculation(df, unit_name)
+            
+        logging.info('Result: '+str(result))
+        return 'Task Created !'

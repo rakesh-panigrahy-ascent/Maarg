@@ -479,18 +479,21 @@ $(document).ready(function(){
 
     $("#calculate_distance_btn").click(function(){
         var form_data = new FormData();
+        var auto_distance_matrix = $('#auto_distance_matrix').prop('checked')
         //var ins = document.getElementById('coordinate_file').files.length;
         var unitname = $('#unit_name').val()
         var state = $('#state').val()
-
-        if (unit_name == 'Select'){
-            alert('Kindly select unit name !')
-            return false
-        }
-
-        if (state == 'Select'){
-            alert('Kindly select the state !')
-            return false
+        
+        if (auto_distance_matrix == false){
+            if (unit_name == 'Select'){
+                alert('Kindly select unit name !')
+                return false
+            }
+    
+            if (state == 'Select'){
+                alert('Kindly select the state !')
+                return false
+            }
         }
 
         /*file_count = document.getElementById('coordinate_file').files.length
@@ -505,6 +508,7 @@ $(document).ready(function(){
 
         form_data.append('unitname', unitname)
         form_data.append('state', state);
+        form_data.append('auto_distance_matrix', auto_distance_matrix)
 
         csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
 
