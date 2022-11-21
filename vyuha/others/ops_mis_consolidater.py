@@ -847,24 +847,23 @@ class OpsMIS:
             self.status = False
 
     def start_pipeline(self):
-        # try:
-        #     self.extract_ops_salary_sheet()
-        #     self.get_finance_mis_source()
-        #     self.get_query_kpis()
-        #     self.logistics_last_mile_source()
-        #     self.logistics_mid_mile_source()
-        # except Exception as e:
-        #     exc_type, exc_obj, exc_tb = sys.exc_info()
-        #     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        #     print(exc_type, fname, exc_tb.tb_lineno, str(e))
-        #     logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
-        # try:
-        #     shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
-        # except:
-            # pass
+        try:
+            self.extract_ops_salary_sheet()
+            self.get_finance_mis_source()
+            self.get_query_kpis()
+            self.logistics_last_mile_source()
+            self.logistics_mid_mile_source()
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+        try:
+            shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
+        except:
+            pass
         self.merge_sheets()
 
-# if __name__ == '__main__':
-#     opsmis = OpsMIS()
-#     opsmis.start_pipeline()
-    # opsmis.merge_sheets()
+if __name__ == '__main__':
+    opsmis = OpsMIS()
+    opsmis.start_pipeline()
