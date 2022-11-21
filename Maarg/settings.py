@@ -48,6 +48,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.150.0.24']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -162,6 +163,10 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
+
+CRONJOBS = [
+    ('*/5 * * * *', 'vyuha.views.run_distance_matrix_cron', '>> /tmp/scheduled_job.log')
+]
 
 
 

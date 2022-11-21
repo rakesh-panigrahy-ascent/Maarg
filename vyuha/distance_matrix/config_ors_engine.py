@@ -5,7 +5,7 @@ import sys
 import subprocess
 from time import sleep, time
 from urllib import request
-from Maarg.settings import OSM_CONFIG_JSON_PATH, OSM_DATA_DIR, CONTAINER_ID
+from Maarg.settings import OSM_CONFIG_JSON_PATH, OSM_DATA_DIR, CONTAINER_ID, PROD
 import requests
 import time
 import docker
@@ -34,31 +34,36 @@ def change_osm_file(filename='odisha'):
     ors_config['ors']['services']['routing']['sources'][0] = new_file
     fout.write(json.dumps(ors_config))
     fout.close()
-    stop_container()
-    start_container()
+    restart_container()
 
 def start_container():
     logging.info('Starting Container')
-    # cmd = 'docker container start {}'.format(CONTAINER_ID)
-    # subprocess.run(cmd)
-    container = client.containers.get(CONTAINER_ID)
-    container.start()
+    if PROD == False:
+        cmd = 'docker container start {}'.format(CONTAINER_ID)
+        subprocess.run(cmd)
+    else:
+        container = client.containers.get(CONTAINER_ID)
+        container.start()
     return None
 
 def stop_container():
     logging.info('Stoping Container')
-    # cmd = 'docker container stop {}'.format(CONTAINER_ID)
-    # subprocess.run(cmd)
-    container = client.containers.get(CONTAINER_ID)
-    container.stop()
+    if PROD == False:
+        cmd = 'docker container stop {}'.format(CONTAINER_ID)
+        subprocess.run(cmd)
+    else:
+        container = client.containers.get(CONTAINER_ID)
+        container.stop()
     return None
 
 def restart_container():
     logging.info('Restarting Container')
-    # cmd = 'docker container stop {}'.format(CONTAINER_ID)
-    # subprocess.run(cmd)
-    container = client.containers.get(CONTAINER_ID)
-    container.restart()
+    if PROD == False:
+        cmd = 'docker container restart {}'.format(CONTAINER_ID)
+        subprocess.run(cmd)
+    else:
+        container = client.containers.get(CONTAINER_ID)
+        container.restart()
     return None
 
 def get_osm_file_list():
@@ -82,7 +87,7 @@ def check_ors_status(timer=5):
     end_time = time.time()
     duration = end_time - start_time
     while duration <= timer:
-        print('Duration: {} seconds', duration)
+        print('Duration: {} seconds'.format(duration))
         try:
             call = requests.get('http://localhost:8080/ors/v2/health', timeout=10)
             resp =  call.text

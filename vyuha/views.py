@@ -204,7 +204,28 @@ def download_distance_matrix_files(request):
    else:
       return redirect(index)
 
+def run_distance_matrix_cron():
+   units = sq.sheetsToDf(sheeter,spreadsheet_id='1omUxQ2wSUgnJxQsdUinp21qfwn-ld8KDSI7Leocrgsg',sh_name='unit-state')
+   units = units[units['active'] == '1']
+   print(units)
+   print(type(units))
+   if units.empty == True:
+      resp = {'data':'No Units !'}
+      return JsonResponse(resp)
+
+   if PROD == True:
+      result = calculate_auto_distance_matrix_task.delay(units)
+   else:
+      result = calculate_auto_distance_matrix_task(units)
+
+   resp = {'data':'Your task is in queuee...'}
+   return JsonResponse(resp)
+
 def calculate_distance(request):
+   auto_distance_matrix = request.POST['auto_distance_matrix']
+   if auto_distance_matrix == 'true':
+      return run_distance_matrix_cron()
+
    state = request.POST['state']
    unit_name = request.POST['unitname']
    output_filename = unit_name+'_coordinates.csv'
@@ -231,9 +252,6 @@ def calculate_distance(request):
    coordinate_file.to_csv(output_file_path, index=False)
 
    # handle_uploaded_file(request.FILES['file'], output_filename)
-   resp = {'data':'Your task is in queuee...'}
-
-   return JsonResponse(resp)
    
    input_file = 'vyuha/distance_matrix/input_files/{}'.format(output_filename)
    df = pd.read_csv(input_file)
