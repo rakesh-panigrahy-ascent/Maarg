@@ -12,6 +12,7 @@ from vyuha.tasks import *
 import sys
 from itertools import product
 import re
+from vyuha.mailer.common_mailer import send_mail
 
 warnings.filterwarnings("ignore")
 
@@ -164,6 +165,11 @@ class distance_matrix:
         print('ors_engine_status', ors_engine_status)
 
         if ors_engine_status != 'ready':
+            subject = 'Engine Starting Failed'
+            to = ['rakesh.panigrahy@ahwspl.com'] 
+            cc = []
+            text = 'Not started for {}'.format(state)
+            send_mail(subject, to, cc, text)
             resp = {'data': 'ORS Engine Status: {}'.format(ors_engine_status)}
             return resp
         

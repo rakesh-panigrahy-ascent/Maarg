@@ -6,6 +6,7 @@ from vyuha.distance_matrix.calculate_distance_matrix_v3 import *
 from vyuha.distance_matrix.cluster import *
 import vyuha.others.ops_mis_sheeter as oms
 from vyuha.connection import *
+import json
 
 app = Celery('tasks', backend='amqp', broker='amqp://')
 
@@ -25,12 +26,24 @@ def calculate_auto_distance_matrix_task(units):
     tableau_data_path = 'vyuha/distance_matrix/input_files/coordinates.csv'
     fetch_tableau_data(output_file = tableau_data_path)
     
+    units = json.loads(units)
+    units = pd.DataFrame(units)
+    
     dist_matrix = distance_matrix()
     for index, row in units.iterrows():
         state = row['osm_state']
         unit_name = row['dist_name']
         print(unit_name, state)
+        temp = units[units['dist_name'] == unit_name]
+        temp = temp.loc[:, ['dist_id', 'dist_name', 'latitude', 'longitude']]
+        temp['Customer Code'] = temp['dist_name']
+        temp['Customer Name'] = temp['dist_name']
+        temp.rename(columns={'dist_name':'Distributor Name', 'dist_id':'distributor_id'}, inplace=True)
         df = dist_matrix.calculate_auto_distance_matrix(unit_name, state)
+        df = json.loads(df)
+        df = pd.DataFrame(df)
+        df = pd.concat([df, temp])
+        df = df.to_json()
         # if PROD == True:
             # result = start_distance_matrix_calculation.delay(df, unit_name)
         # else:
