@@ -130,25 +130,21 @@ class distance_matrix:
         distance_matrix_df.drop(columns=['source', 'destination'], inplace=True)
         distance_matrix_df.drop_duplicates(inplace=True)
         print('Shape:', distance_matrix_df.shape)
-
-
-
-        distance_matrix_df_cp = distance_matrix_df.copy()
-        df_c = df.copy()
-        df_c.rename(columns={'latitude':'s_lat', 'longitude':'s_lon'}, inplace=True)
-        distance_matrix_df_cp = distance_matrix_df_cp.merge(df_c, on=['s_lat','s_lon'], how='left')
-        distance_matrix_df_cp.rename(columns={'Customer Code':'from_customer_code'}, inplace=True)
-        df_c = df.copy()
-        df_c.rename(columns={'latitude':'d_lat', 'longitude':'d_lon'}, inplace=True)
-        distance_matrix_df_cp = distance_matrix_df_cp.merge(df_c, on=['d_lat','d_lon'], how='left')
-        distance_matrix_df_cp.rename(columns={'Customer Code':'to_customer_code'}, inplace=True)
-        distance_matrix_df_cp.drop(columns=['distributor_id_x', 'Distributor Name_x', 'Customer Name_x', 'Customer Name_y', 'distributor_id_y', 'Distributor Name_y'], inplace=True)
-        distance_matrix_df_cp
-
-        output_file_name += '_distance_matrix.csv'
-        output_file = 'vyuha/distance_matrix/output_files/{}'.format(output_file_name)
         
         try:
+            distance_matrix_df_cp = distance_matrix_df.copy()
+            df_c = df.copy()
+            df_c.rename(columns={'latitude':'s_lat', 'longitude':'s_lon'}, inplace=True)
+            distance_matrix_df_cp = distance_matrix_df_cp.merge(df_c, on=['s_lat','s_lon'], how='left')
+            distance_matrix_df_cp.rename(columns={'Customer Code':'from_customer_code'}, inplace=True)
+            df_c = df.copy()
+            df_c.rename(columns={'latitude':'d_lat', 'longitude':'d_lon'}, inplace=True)
+            distance_matrix_df_cp = distance_matrix_df_cp.merge(df_c, on=['d_lat','d_lon'], how='left')
+            distance_matrix_df_cp.rename(columns={'Customer Code':'to_customer_code'}, inplace=True)
+            distance_matrix_df_cp.drop(columns=['distributor_id_x', 'Distributor Name_x', 'Customer Name_x', 'Customer Name_y', 'distributor_id_y', 'Distributor Name_y'], inplace=True)
+            # distance_matrix_df_cp
+            output_file_name += '_distance_matrix.csv'
+            output_file = 'vyuha/distance_matrix/output_files/{}'.format(output_file_name)
             distance_matrix_df_cp.to_csv(output_file, index=False)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()

@@ -207,6 +207,8 @@ def download_distance_matrix_files(request):
 def run_distance_matrix_cron():
    units = sq.sheetsToDf(sheeter,spreadsheet_id='1omUxQ2wSUgnJxQsdUinp21qfwn-ld8KDSI7Leocrgsg',sh_name='unit-state')
    units = units[units['active'] == '1']
+   units['latitude'] = units['latitude'].astype(float)
+   units['longitude'] = units['longitude'].astype(float)
    print(units)
    print(type(units))
    if units.empty == True:
