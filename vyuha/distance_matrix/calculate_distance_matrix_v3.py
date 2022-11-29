@@ -148,7 +148,14 @@ class distance_matrix:
         output_file_name += '_distance_matrix.csv'
         output_file = 'vyuha/distance_matrix/output_files/{}'.format(output_file_name)
         
-        distance_matrix_df_cp.to_csv(output_file, index=False)
+        try:
+            distance_matrix_df_cp.to_csv(output_file, index=False)
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print('Error for: ')
+            print(exc_type, fname, exc_tb.tb_lineno, str(e))
+
         logging.info(str(datetime.today())+'-->'+'Done')
         return distance_matrix_df_cp
 
