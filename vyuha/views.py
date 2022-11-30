@@ -216,7 +216,7 @@ def run_distance_matrix_cron():
       return JsonResponse(resp)
    units = units.to_json()
    if PROD == True:
-      result = calculate_auto_distance_matrix_task.delay(units)
+      result = calculate_auto_distance_matrix_task(units)
    else:
       result = calculate_auto_distance_matrix_task(units)
 

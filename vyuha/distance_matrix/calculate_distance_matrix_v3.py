@@ -13,6 +13,7 @@ import sys
 from itertools import product
 import re
 from vyuha.mailer.common_mailer import send_mail
+import joblib
 
 warnings.filterwarnings("ignore")
 
@@ -65,41 +66,46 @@ class distance_matrix:
     
 
     def distance(self,df, output_file_name):
-        print('Distance Calculation Started for ', output_file_name)
-        df = json.loads(df)
-        df = pd.DataFrame(df)
-        logging.info(str(datetime.today()))
-        print('Dataframe:', df.head())
-        
-        x = df.loc[:, ['longitude', 'latitude']].values
-        x = x.tolist()
-        for c in x:
-            if c == [0.0, 0.0]:
-                x.remove(c)
-        
+        try:
+            print('Distance Calculation Started for ', output_file_name)
+            df = json.loads(df)
+            df = pd.DataFrame(df)
+            logging.info(str(datetime.today()))
+            print('Dataframe:', df.head())
+            
+            x = df.loc[:, ['longitude', 'latitude']].values
+            x = x.tolist()
+            for c in x:
+                if c == [0.0, 0.0]:
+                    x.remove(c)
+            
 
-        master_list = []
-        if len(x) > 10:
-            for n in range(len(x)-9):
-                print('n', n)
-                for i in range(n+1, len(x), 9):
-                    last_index = i+9
-                    if i+9 > len(x)+1:
-                        last_index = len(x)+1
-                    print(n, i, last_index)
-                    coords = x[i:last_index]
-                    coords.append(x[n])
-                    print(coords)
-                    call = self.call_distance_matrix_api(coords)
-                    if call == False:
-                        continue
+            master_list = []
+            if len(x) > 10:
+                for n in range(len(x)-9):
+                    print('n', n)
+                    for i in range(n+1, len(x), 9):
+                        last_index = i+9
+                        if i+9 > len(x)+1:
+                            last_index = len(x)+1
+                        print(n, i, last_index)
+                        coords = x[i:last_index]
+                        coords.append(x[n])
+                        print(coords)
+                        call = self.call_distance_matrix_api(coords)
+                        if call == False:
+                            continue
+                        master_list.append(call.text)
+            else:
+                coords = x
+                print(coords)
+                call = self.call_distance_matrix_api(coords)
+                if call != False:
                     master_list.append(call.text)
-        else:
-            coords = x
-            print(coords)
-            call = self.call_distance_matrix_api(coords)
-            if call != False:
-                master_list.append(call.text)
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print('Error for:', exc_type, fname, exc_tb.tb_lineno, str(e))
 
         
 
@@ -118,6 +124,7 @@ class distance_matrix:
                         dest.append(locations[j])
                         distance.append(distances[i][j])
             except Exception as e:
+                joblib.dump(master_list, 'vyuha/distance_matrix/output_files/objects/master_list_{}'.format(output_file_name))
                 print(data)
         distance_matrix_df['source'] = source
         distance_matrix_df['destination'] = dest

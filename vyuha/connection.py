@@ -49,14 +49,15 @@ def fetch4rmDL3(query):
 def get_cluster_sales_data(start_date, end_date, unit_asset_id, is_export_as=None):
     conn = get_dl3_connection()
     
-    query = getQuery('cluster_sales_data.sql', start_date, end_date, unit_asset_id)
+    query = getQuery('cluster_sales_data_new.sql', start_date, end_date, unit_asset_id)
     t = text(query)
     print(t)
     conn = get_dl3_connection()
     df = pd.read_sql(t, conn)
 
     if is_export_as != None:
-        output_file = 'vyuha/distance_matrix/output_files/sales/{}.csv'.format(is_export_as)
+        # output_file = 'vyuha/distance_matrix/output_files/sales/{}.csv'.format(is_export_as)
+        output_file = 'vyuha/distance_matrix/output_files/sales/sales.csv'
         print(output_file)
         df.to_csv(output_file, index=False)
     return df
