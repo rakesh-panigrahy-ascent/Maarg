@@ -172,7 +172,7 @@ def check_cluster_requirement(request):
    else:
       distance_matrix = output_files[0]
 
-   sales_file = unit_name.title()+'.csv'
+   sales_file = 'sales.csv'#unit_name.title()+'.csv'
 
    output_dir = 'vyuha/distance_matrix/output_files/sales'
    output_files = os.listdir(output_dir)

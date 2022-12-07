@@ -30,37 +30,53 @@ class distance_matrix:
             'Content-Type': 'application/json; charset=utf-8'
         }
 
-    def call_distance_matrix_api(self, coords):
-        if len(coords) == 0:
-            return False
-        
-        body = {"locations":coords, "metrics":["distance"]}
-        call = requests.post('http://localhost:8080/ors/v2/matrix/driving-car', json=body, headers=self.headers)
-        print(call.status_code, call.reason)
-        
-        if call.status_code == 404:
-            resp = json.loads(call.text)
-            error_msg = resp['error']['message']
-            print(error_msg)
-            
-            try:
-                txt = "bounds: [0-9]+\.[0-9]+,+[0-9]+\.[0-9]+. Destination"
-                error_coord = re.findall(txt, error_msg)[0]
-            except:
-                txt = "bounds: [0-9]+\.[0-9]+,+[0-9]+\.[0-9]+."
-                error_coord = re.findall(txt, error_msg)[0]
-                
-            txt = "[0-9]+\.[0-9]+,+[0-9]+\.[0-9]+"
-            error_coord = re.findall(txt, error_coord)
-            error_coord = [[i] for i in error_coord]
-            error_coord = [j[0].split(',') for j in error_coord]
-            print(error_coord)
+    def call_distance_matrix_api(self, coords, count=0):
+        try:
+            if len(coords) == 0 or count >9:
+                return False
 
-            c = [float(error_coord[0][1]), float(error_coord[0][0])]
-            print('To be Excluded', c)
-            coords.remove(c)
-            self.call_distance_matrix_api(coords)
-        return call
+            headers = {
+                'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                'Authorization': '5b3ce3597851110001cf62488808957a219b4d4abf24063f0fa5b1a2',
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+
+            body = {"locations":coords, "metrics":["distance"]}
+            call = requests.post('http://localhost:8080/ors/v2/matrix/driving-car', json=body, headers=headers)
+            print(call.status_code, call.reason)
+
+            try:
+                resp = json.loads(call.text)
+                error_status_code = resp['error']
+            except:
+                error_status_code = 200
+
+
+            if call.status_code == 404 or error_status_code == 6010:
+                resp = json.loads(call.text)
+                error_msg = resp['error']['message']
+                print(error_msg)
+
+                try:
+                    txt = "bounds: [0-9]+\.[0-9]+,+[0-9]+\.[0-9]+. Destination"
+                    error_coord = re.findall(txt, error_msg)[0]
+                except:
+                    txt = "bounds: [0-9]+\.[0-9]+,+[0-9]+\.[0-9]+."
+                    error_coord = re.findall(txt, error_msg)[0]
+
+                txt = "[0-9]+\.[0-9]+,+[0-9]+\.[0-9]+"
+                error_coord = re.findall(txt, error_coord)
+                error_coord = [[i] for i in error_coord]
+                error_coord = [j[0].split(',') for j in error_coord]
+                print(error_coord)
+
+                c = [float(error_coord[0][1]), float(error_coord[0][0])]
+                print('To be Excluded', c)
+                coords.remove(c)
+                self.call_distance_matrix_api(coords, count+1)
+            return call
+        except Exception as e:
+            return False
 
     
     
@@ -81,21 +97,26 @@ class distance_matrix:
             
 
             master_list = []
-            if len(x) > 10:
-                for n in range(len(x)-9):
-                    print('n', n)
-                    for i in range(n+1, len(x), 9):
-                        last_index = i+9
-                        if i+9 > len(x)+1:
-                            last_index = len(x)+1
-                        print(n, i, last_index)
-                        coords = x[i:last_index]
-                        coords.append(x[n])
-                        print(coords)
-                        call = self.call_distance_matrix_api(coords)
-                        if call == False:
-                            continue
-                        master_list.append(call.text)
+            iteration = 1
+            for n in range(len(x)-9):
+                print('n', n)
+                print('length', len(x))
+                if len(x) - 10 < n:
+                    break
+                for i in range(n+1, len(x), 9):
+                    print('Iteration: ', iteration)
+                    last_index = i+9
+                    if i+9 > len(x)+1:
+                        last_index = len(x)+1
+                    print(n, i, last_index)
+                    coords = x[i:last_index]
+                    coords.append(x[n])
+                    print(coords)
+                    call = self.call_distance_matrix_api(coords)
+                    if call == False:
+                        continue
+                    master_list.append(call.text)
+                iteration += 1
             else:
                 coords = x
                 print(coords)

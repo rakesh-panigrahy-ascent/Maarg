@@ -12,6 +12,8 @@ from calendar import monthrange
 import shutil
 import logging
 logging.basicConfig(filename='vyuha/distance_matrix/log/distance_matrix.log', level=logging.INFO)
+import warnings
+warnings.filterwarnings(action='ignore')
 
 driver,sheeter = sq.apiconnect()
 
@@ -128,8 +130,8 @@ class OpsMIS:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 print(exc_type, fname, exc_tb.tb_lineno, str(e))
-                logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
-                self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+                logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
+                self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
                 self.status = False
 
     def get_working_days(self, x):
@@ -291,7 +293,7 @@ class OpsMIS:
                         'Total Operating Cost (after THEA reimbursement Deduction)',
                         '1.a.ii Vehicle running & mainteinance cost (Actual)','Intercompany Sales (W/o Gst)',
                         'Total Operating Cost (before THEA reimbursement Deduction)','3. Packaging Cost','Others',
-                        'Payment to outside Agency','Dialhealth Delivery Cost', 'Last Mile (MIS)']]
+                        'Payment to outside Agency','Dialhealth Delivery Cost', 'Last Mile (MIS)', 'Water Charges']]
 
                 final_mis_source_df = pd.concat([final_mis_source_df, mis_source_df], ignore_index = True)
             
@@ -304,8 +306,8 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
             self.status = False
     
     def get_query_kpis(self):
@@ -357,8 +359,8 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
             self.status = False
 
     def logistics_last_mile_source(self):
@@ -407,13 +409,17 @@ class OpsMIS:
                                                         'Supervisor_headcount':'3rd Supervisor Headcount',
                                                         'Biker_headcount':'3rd Biker Headcount',
                                                         'Van_headcount':'3rd Van Headcount'}, inplace = True)
-
-                    master_logistics_df = pd.concat([master_logistics_df, logistics_source_df], ignore_index = True)
+                    print('master_logistics_df:', master_logistics_df.columns)
+                    print('logistics_source_df:', logistics_source_df.columns)
+                    if master_logistics_df is None:
+                        master_logistics_df = logistics_source_df
+                    else:
+                        master_logistics_df = pd.concat([master_logistics_df, logistics_source_df], ignore_index = True)
                 except Exception as e:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                     print(exc_type, fname, exc_tb.tb_lineno, str(e))
-                    logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+                    logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
 
             unit_map_copy = unit_map[['Logistics', 'OPS MIS']]
             unit_map_copy.drop_duplicates(subset=['Logistics'], inplace=True)
@@ -430,8 +436,8 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
             self.status = False
 
     def logistics_mid_mile_source(self):
@@ -472,8 +478,8 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
             self.status = False
 
 
@@ -500,7 +506,11 @@ class OpsMIS:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
                     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                     print(exc_type, fname, exc_tb.tb_lineno, str(e))
-                    logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+                    logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
+            #outputfile = os.path.join(os.path.dirname(__file__))+'/mis/output_files/Main.csv'
+            # main_file.to_csv(outputfile, index=False)
+            # return main_file
+
 
             # print(main_file.columns.tolist())
             main_file = self.calculate_kpis(main_file)
@@ -515,8 +525,8 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
             self.status = False
 
     def calculate_kpis(self, all_kpis_df):
@@ -524,6 +534,20 @@ class OpsMIS:
             print(type(all_kpis_df))
             # print(all_kpis_df.columns.tolist())
             # Logistics kpis
+            all_kpis_df['Last Mile Cost/Order'] = all_kpis_df['Last Mile (MIS)']/all_kpis_df['Billed orders (Total)']
+            all_kpis_df['Mid Mile Cost/Order'] = all_kpis_df['Mid mile (MIS)']/all_kpis_df['Billed orders (Total)']
+            all_kpis_df['Water Charges'] = all_kpis_df['Water Charges']/all_kpis_df['Billed orders (Total)']
+            all_kpis_df['Last Mile Cost/Order'] = all_kpis_df['Last Mile Cost/Order'] * 1000000
+            all_kpis_df['Mid Mile Cost/Order'] = all_kpis_df['Mid Mile Cost/Order'] * 1000000
+            all_kpis_df['Water Charges'] = all_kpis_df['Water Charges'] * 1000000
+            
+            all_kpis_df['Total Working Days'] = all_kpis_df['month'].apply(self.get_working_days)
+            all_kpis_df['Daily Billed orders ( Retail )'] = all_kpis_df['Billed orders ( Retail )']/all_kpis_df['Total Working Days']
+            all_kpis_df['Daily Billed orders (Inter company )'] = all_kpis_df['Billed orders (Inter company )']/all_kpis_df['Total Working Days']
+            all_kpis_df['Daily Billed orders (Total)'] = all_kpis_df['Billed orders (Total)']/all_kpis_df['Total Working Days']
+
+            
+
             all_kpis_df['Total Salary--Delivery'] = all_kpis_df['Total Salary--Delivery'] / 1000000
             all_kpis_df['Supervisor'] = all_kpis_df['Supervisor'] / 1000000
             all_kpis_df['Biker'] = all_kpis_df['Biker'] / 1000000
@@ -597,6 +621,7 @@ class OpsMIS:
             # all_kpis_df[''] = all_kpis_df['1. Salaries & Wages']/all_kpis_df['']
             # all_kpis_df['Cost per Mandays - Salary & Wages'] = all_kpis_df['1. Salaries & Wages']/all_kpis_df['Worked Mandays']
             # all_kpis_df['Cost per ManMonth - Salary & Wages'] = all_kpis_df['']/all_kpis_df['']
+            # all_kpis_df['Cost per ManMonth - Salary & Wages'] = all_kpis_df['Cost per ManMonth - Salary & Wages'] * 1000000
             all_kpis_df['Inward Productivity (Inward Strips Per Manday)'] = all_kpis_df['Inward Strips']/all_kpis_df['Worked Mandays--Present Head Count--Inward']
             all_kpis_df['Store Productivity (Billed line Items per Manday)'] = all_kpis_df['Billed line items (Total)']/all_kpis_df['Worked Mandays--Present Head Count--Store']
             all_kpis_df['Checking Productivity (Billed Strips Per Manday)'] = all_kpis_df['Billed Strips (Total)']/all_kpis_df['Worked Mandays--Present Head Count--Checking']
@@ -810,14 +835,14 @@ class OpsMIS:
                     'Value of Non-moving item', 'Percentage of Non-moving item',
                     'Sale Return Percentage','Expiry Return Percentage','Total Last mile (Actual)','Payment to outside Agency','Dialhealth Delivery Cost',
                     'Total Last mile (Actual) as a % of Net Revenue','Provision Mid mile','Provision Last mile Payment to ourside agency','Ops Salaries & Wages',
-                    'Ops Salaries & Wages as a % of Net Revenue','Present Head Count Ops','Cost per man per month Total Operations']]
+                    'Ops Salaries & Wages as a % of Net Revenue','Present Head Count Ops','Cost per man per month Total Operations', 'Daily Billed orders ( Retail )', 'Daily Billed orders (Inter company )', 'Daily Billed orders (Total)']]
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
             self.status = False
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
         return all_kpis_df
     
     def generate_key_file(self, final_df):
@@ -842,8 +867,8 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            self.error = exc_type+' '+fname+' '+exc_tb.tb_lineno+' '+str(e)
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
             self.status = False
 
     def start_pipeline(self):
@@ -857,7 +882,7 @@ class OpsMIS:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno, str(e))
-            logging.error(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
         try:
             shutil.copy(os.path.join(os.path.dirname(__file__))+'/mis/input_files/Extracted Warehouse Area Sheet.csv', os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted Warehouse Area Sheet.csv')
         except:
