@@ -151,6 +151,7 @@ class distance_matrix:
 
         
         print('Processing masterlist data...')
+        joblib.dump(master_list, 'vyuha/distance_matrix/output_files/objects/master_list_{}'.format(output_file_name))
         source = []
         dest = []
         distance = []
@@ -166,7 +167,9 @@ class distance_matrix:
                         dest.append(locations[j])
                         distance.append(distances[i][j])
             except Exception as e:
-                joblib.dump(master_list, 'vyuha/distance_matrix/output_files/objects/master_list_{}'.format(output_file_name))
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno, str(e))
                 print(data)
         distance_matrix_df['source'] = source
         distance_matrix_df['destination'] = dest
