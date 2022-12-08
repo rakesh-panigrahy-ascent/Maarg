@@ -41,7 +41,7 @@ def calculate_auto_distance_matrix_task(units):
             temp['Customer Code'] = temp['dist_name']
             temp['Customer Name'] = temp['dist_name']
             temp.rename(columns={'dist_name':'Distributor Name', 'dist_id':'distributor_id'}, inplace=True)
-            df = dist_matrix.calculate_auto_distance_matrix(unit_name, state)
+            df = dist_matrix.build_engine_data(unit_name, state)
             df = json.loads(df)
             df = pd.DataFrame(df)
             df = pd.concat([df, temp])

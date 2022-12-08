@@ -31,6 +31,7 @@ class distance_matrix:
         }
 
     def call_distance_matrix_api(self, coords, count=0):
+        print('distance matrix api:{}'.format(count))
         try:
             if len(coords) == 0 or count >9:
                 return False
@@ -47,7 +48,9 @@ class distance_matrix:
 
             try:
                 resp = json.loads(call.text)
-                error_status_code = resp['error']
+                error_status_code = resp['error']['code']
+                if resp['error']['code'] == 6004:
+                    return 6004
             except:
                 error_status_code = 200
 
@@ -76,6 +79,7 @@ class distance_matrix:
                 self.call_distance_matrix_api(coords, count+1)
             return call
         except Exception as e:
+            print('Inside distance api exception:', str(e))
             return False
 
     
@@ -98,27 +102,44 @@ class distance_matrix:
 
             master_list = []
             iteration = 1
-            for n in range(len(x)-9):
-                print('n', n)
-                print('length', len(x))
-                if len(x) - 10 < n:
-                    break
-                for i in range(n+1, len(x), 9):
-                    print('Iteration: ', iteration)
-                    last_index = i+9
-                    if i+9 > len(x)+1:
-                        last_index = len(x)+1
-                    print(n, i, last_index)
-                    coords = x[i:last_index]
-                    coords.append(x[n])
-                    print(coords)
-                    call = self.call_distance_matrix_api(coords)
-                    if call == False:
-                        continue
-                    master_list.append(call.text)
-                iteration += 1
+            if len(x) > 10:
+                for n in range(len(x)-9):
+                    try:
+                        print('n', n)
+                        print('length', len(x))
+                        if len(x) - 10 < n:
+                            break
+                        for i in range(n+1, len(x), 9):
+                            try:
+                                print('Iteration: ', iteration)
+                                last_index = i+9
+                                if i+9 > len(x)+1:
+                                    last_index = len(x)+1
+                                print(n, i, last_index)
+                                coords = x[i:last_index]
+                                coords.append(x[n])
+                                print(coords)
+                                call = self.call_distance_matrix_api(coords)
+                                if call == False:
+                                    continue
+                                if call == 6004:
+                                    break
+                                master_list.append(call.text)
+                            except Exception as e:
+                                exc_type, exc_obj, exc_tb = sys.exc_info()
+                                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                                print(exc_type, fname, exc_tb.tb_lineno, str(e))
+                        iteration += 1
+                        if call == 6004:
+                            break
+                    except Exception as e:
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                        print(exc_type, fname, exc_tb.tb_lineno, str(e))
+                print('For loop done !')
             else:
                 coords = x
+                print('Inside First Else')
                 print(coords)
                 call = self.call_distance_matrix_api(coords)
                 if call != False:
@@ -129,7 +150,7 @@ class distance_matrix:
             print('Error for:', exc_type, fname, exc_tb.tb_lineno, str(e))
 
         
-
+        print('Processing masterlist data...')
         source = []
         dest = []
         distance = []
@@ -183,7 +204,7 @@ class distance_matrix:
         logging.info(str(datetime.today())+'-->'+'Done')
         return distance_matrix_df_cp
 
-    def calculate_auto_distance_matrix(self, unit_name, state):
+    def build_engine_data(self, unit_name, state):
         output_filename = unit_name+'_coordinates.csv'
         current_osm_file = get_current_osm_file().split('/')[1].split('-')[0].title()
 
