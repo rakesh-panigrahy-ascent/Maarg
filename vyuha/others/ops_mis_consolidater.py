@@ -135,51 +135,72 @@ class OpsMIS:
                 self.status = False
 
     def get_working_days(self, x):
-        print(x.date())
-        MONTH = x.month
-        YEAR = x.year
-        print(MONTH, YEAR)
-        sundays = 0
-        cal = calendar.Calendar()
+        try:
+            try:
+                x = datetime.strptime(x, '%Y-%m-%d').date()
+            except:
+                pass
+            # print(x.date())
+            MONTH = x.month
+            YEAR = x.year
+            # print(MONTH, YEAR)
+            sundays = 0
+            cal = calendar.Calendar()
 
-        for day in cal.itermonthdates(YEAR, MONTH):
-            if day.weekday() == 6 and day.month == MONTH:
-                sundays += 1
-        # print(sundays)
-        # print(monthrange(YEAR, MONTH))
-        working_days = monthrange(YEAR, MONTH)[1] - sundays
-        print('Working Days:', working_days)
-        return working_days
+            for day in cal.itermonthdates(YEAR, MONTH):
+                if day.weekday() == 6 and day.month == MONTH:
+                    sundays += 1
+            # print(sundays)
+            # print(monthrange(YEAR, MONTH))
+            working_days = monthrange(YEAR, MONTH)[1] - sundays
+            # print('Working Days:', working_days)
+            return working_days
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
+            self.status = False
+
             
 
     def format_ops_salary_export_data(self, section, final_df, department_level=0):
-        if department_level == 1:
-            final_df['temp'] = section
-            final_df['Department -NEW'] = final_df[['temp','Department -NEW']].agg('--'.join, axis=1)
-            final_df = final_df.drop('temp',axis = 1)
-            final_df = (final_df.pivot_table(index=["unit_name","month"], columns=['Department -NEW'], values=[section]).reset_index())
-            final_df.columns = final_df.columns.droplevel()
+        try:
+            if department_level == 1:
+                final_df['temp'] = section
+                final_df['Department -NEW'] = final_df[['temp','Department -NEW']].agg('--'.join, axis=1)
+                final_df = final_df.drop('temp',axis = 1)
+                final_df = (final_df.pivot_table(index=["unit_name","month"], columns=['Department -NEW'], values=[section]).reset_index())
+                final_df.columns = final_df.columns.droplevel()
 
-            final_df.rename(columns={final_df.columns[0]: 'unit_name'}, inplace = True)
-            col_name_list = final_df.columns.tolist()
-            col_name_list[1] = 'month'
-            final_df.columns = col_name_list
-            outputfile = os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted {} Department Level Sheet.csv'.format(section)
-        else:
-            final_df['temp'] = section
-            final_df['department_sub-department'] = final_df[['temp','Department -NEW', 'Sub-Department-NEW']].agg('--'.join, axis=1)
-            final_df = final_df.drop('temp',axis = 1)
-            final_df = final_df.drop(['Department -NEW', 'Sub-Department-NEW'], axis=1)
+                final_df.rename(columns={final_df.columns[0]: 'unit_name'}, inplace = True)
+                col_name_list = final_df.columns.tolist()
+                col_name_list[1] = 'month'
+                final_df.columns = col_name_list
+                outputfile = os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted {} Department Level Sheet.csv'.format(section)
+            else:
+                final_df['temp'] = section
+                final_df['department_sub-department'] = final_df[['temp','Department -NEW', 'Sub-Department-NEW']].agg('--'.join, axis=1)
+                final_df = final_df.drop('temp',axis = 1)
+                final_df = final_df.drop(['Department -NEW', 'Sub-Department-NEW'], axis=1)
 
-            final_df = (final_df.pivot_table(index=["unit_name","month"], columns=['department_sub-department'], values=[section]).reset_index())
-            final_df.columns = final_df.columns.droplevel()
+                final_df = (final_df.pivot_table(index=["unit_name","month"], columns=['department_sub-department'], values=[section]).reset_index())
+                final_df.columns = final_df.columns.droplevel()
 
-            final_df.rename(columns={final_df.columns[0]: 'unit_name'}, inplace = True)
-            col_name_list = final_df.columns.tolist()
-            col_name_list[1] = 'month'
-            final_df.columns = col_name_list
-            outputfile = os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted {} Sub Department Level Sheet.csv'.format(section)
-        final_df.to_csv(outputfile, index=False)
+                final_df.rename(columns={final_df.columns[0]: 'unit_name'}, inplace = True)
+                col_name_list = final_df.columns.tolist()
+                col_name_list[1] = 'month'
+                final_df.columns = col_name_list
+                outputfile = os.path.join(os.path.dirname(__file__))+'/mis/output_files/Extracted {} Sub Department Level Sheet.csv'.format(section)
+            final_df.to_csv(outputfile, index=False)
+        except Exception as e:
+            # final_df.to_csv('final_df.csv', index=False)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno, str(e))
+            logging.info(str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e))
+            self.error = str(exc_type)+' '+str(fname)+' '+str(exc_tb.tb_lineno)+' '+str(e)
 
     
     def get_finance_mis_source(self):
@@ -216,6 +237,7 @@ class OpsMIS:
 
             final_mis_source_df = pd.DataFrame()
             for j in range(len(mis_source_sheet_names)):
+                print('Sheet:', mis_source_sheet_names[j])
                 # Reading single_sheet for the 'MIS_Source' file, converting column type to string, and reading particular columns into 'mis_source_sheet_df'
                 mis_source_sheet_df = pd.read_excel(mis_source_excel, sheet_name = mis_source_sheet_names[j])
 
@@ -409,8 +431,8 @@ class OpsMIS:
                                                         'Supervisor_headcount':'3rd Supervisor Headcount',
                                                         'Biker_headcount':'3rd Biker Headcount',
                                                         'Van_headcount':'3rd Van Headcount'}, inplace = True)
-                    print('master_logistics_df:', master_logistics_df.columns)
-                    print('logistics_source_df:', logistics_source_df.columns)
+                    # print('master_logistics_df:', master_logistics_df.columns)
+                    # print('logistics_source_df:', logistics_source_df.columns)
                     if master_logistics_df is None:
                         master_logistics_df = logistics_source_df
                     else:
@@ -531,7 +553,7 @@ class OpsMIS:
 
     def calculate_kpis(self, all_kpis_df):
         try:
-            print(type(all_kpis_df))
+            # print(type(all_kpis_df))
             # print(all_kpis_df.columns.tolist())
             # Logistics kpis
             all_kpis_df['Last Mile Cost/Order'] = all_kpis_df['Last Mile (MIS)']/all_kpis_df['Billed orders (Total)']
