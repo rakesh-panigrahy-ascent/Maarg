@@ -252,7 +252,7 @@ def main():
                             'Worked Mandays--HR', 'Worked Mandays--Data analyst', 'Worked Mandays--Overall Non - Ops',
                             '3rd Supervisor Headcount', '3rd Biker Headcount', '3rd Van Headcount',
                             'Total Biker headcount', 'Payment to outside Agency', 'Dialhealth Delivery Cost', 
-                            'Ops Salaries & Wages', 'Present Head Count Ops']
+                            'Ops Salaries & Wages', 'Present Head Count Ops', 'Daily Billed Orders', 'Logistic Cost/Order']
 
             if kpi[0] not in not_req_kpi:
                 current_date_1 = start_date
@@ -328,8 +328,8 @@ def main():
     
     try:
         subject = 'Operation MIS Completed'
-        to = ['rakesh.panigrahy@ahwspl.com', 'ritesh.thakre@ahwspl.com'] 
-        cc = ['abhishek.mehta@ahwspl.com']
+        to = ['rakesh.panigrahy@ahwspl.com'] 
+        cc = ['mohan.yadav@ahwspl.com']
         text = mail_body()
         attachment_path = mis_file
         send_mail(subject, to, cc, text, attachment_path)

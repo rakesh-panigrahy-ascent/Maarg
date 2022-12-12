@@ -289,7 +289,7 @@ class OpsMIS:
                 mis_source_df['Intercompany Sales (W/o Gst)'] = mis_source_df['Sales - Franchisee'] + mis_source_df['Sales - PE Market Place'] + mis_source_df['Sales - SupplyThis'] + mis_source_df['Sales to Aknamed'] + mis_source_df['Sales to MEDLIFE'] + mis_source_df['Sale to THREPSI'] + mis_source_df['Sales Inter Company Elimination - Cluster'] + mis_source_df['Sales Inter Company Elimination - Out of Cluster'] + mis_source_df['Sales Return - Intercompany']
                 mis_source_df['Total Operating Cost (before THEA reimbursement Deduction)'] = mis_source_df['Total Operating Cost (after THEA reimbursement Deduction)'] + mis_source_df['THEA reimbursement']
                 mis_source_df['3. Packaging Cost'] = mis_source_df['3.a Polybag cost'] + mis_source_df['3.b other packing cost']
-                mis_source_df['Others'] = mis_source_df['AMC (Software)'] + mis_source_df['Audit Fees'] + mis_source_df['Bank Charges'] + mis_source_df['Books & Periodicals'] + mis_source_df['Computer Maintenance']+ mis_source_df['Generator Charges'] + mis_source_df['House Keeping'] + mis_source_df['Insurance Charges - Stock'] + mis_source_df['Legal Charges'] + mis_source_df['Loading & Unloading Charges'] + mis_source_df['Office Expenses'] + mis_source_df['Pooja Expenses'] + mis_source_df['Postage & Courier'] + mis_source_df['Professional Charges'] + mis_source_df['Rates & Taxes'] + mis_source_df['Rent - Guest House'] + mis_source_df['Repairs & Maintenance'] + mis_source_df['Sales Promotion'] + mis_source_df['Security Charges'] + mis_source_df['Travelling & Conveyance'] + mis_source_df['Vehicle Running & Maintenance'] + mis_source_df['Water Charges'] 
+                mis_source_df['Others'] = mis_source_df['AMC (Software)'] + mis_source_df['Audit Fees'] + mis_source_df['Bank Charges'] + mis_source_df['Books & Periodicals'] + mis_source_df['Computer Maintenance']+ mis_source_df['Generator Charges'] + mis_source_df['House Keeping'] + mis_source_df['Insurance Charges - Stock'] + mis_source_df['Legal Charges'] + mis_source_df['Loading & Unloading Charges'] + mis_source_df['Office Expenses'] + mis_source_df['Pooja Expenses'] + mis_source_df['Postage & Courier'] + mis_source_df['Professional Charges'] + mis_source_df['Rates & Taxes'] + mis_source_df['Rent - Guest House'] + mis_source_df['Repairs & Maintenance'] + mis_source_df['Sales Promotion'] + mis_source_df['Security Charges'] + mis_source_df['Travelling & Conveyance'] + mis_source_df['Vehicle Running & Maintenance'] #+ mis_source_df['Water Charges'] 
                 # mis_source_df['1. Total Logistics Cost (MIS)'] = mis_source_df['6. Commission expenses'] + mis_source_df['7. Warehouse Rent']
                 mis_source_df['dist_name'] = mis_source_sheet_names[j]
                 
@@ -558,10 +558,11 @@ class OpsMIS:
             # Logistics kpis
             all_kpis_df['Last Mile Cost/Order'] = all_kpis_df['Last Mile (MIS)']/all_kpis_df['Billed orders (Total)']
             all_kpis_df['Mid Mile Cost/Order'] = all_kpis_df['Mid mile (MIS)']/all_kpis_df['Billed orders (Total)']
-            all_kpis_df['Water Charges'] = all_kpis_df['Water Charges']/all_kpis_df['Billed orders (Total)']
+            all_kpis_df['Water Charges/Order'] = all_kpis_df['Water Charges']/all_kpis_df['Billed orders (Total)']
             all_kpis_df['Last Mile Cost/Order'] = all_kpis_df['Last Mile Cost/Order'] * 1000000
             all_kpis_df['Mid Mile Cost/Order'] = all_kpis_df['Mid Mile Cost/Order'] * 1000000
             all_kpis_df['Water Charges'] = all_kpis_df['Water Charges'] * 1000000
+            all_kpis_df['Water Charges/Order'] = all_kpis_df['Water Charges/Order'] * 1000000
             
             all_kpis_df['Total Working Days'] = all_kpis_df['month'].apply(self.get_working_days)
             all_kpis_df['Daily Billed orders ( Retail )'] = all_kpis_df['Billed orders ( Retail )']/all_kpis_df['Total Working Days']
@@ -857,7 +858,7 @@ class OpsMIS:
                     'Value of Non-moving item', 'Percentage of Non-moving item',
                     'Sale Return Percentage','Expiry Return Percentage','Total Last mile (Actual)','Payment to outside Agency','Dialhealth Delivery Cost',
                     'Total Last mile (Actual) as a % of Net Revenue','Provision Mid mile','Provision Last mile Payment to ourside agency','Ops Salaries & Wages',
-                    'Ops Salaries & Wages as a % of Net Revenue','Present Head Count Ops','Cost per man per month Total Operations', 'Daily Billed orders ( Retail )', 'Daily Billed orders (Inter company )', 'Daily Billed orders (Total)']]
+                    'Ops Salaries & Wages as a % of Net Revenue','Present Head Count Ops','Cost per man per month Total Operations', 'Daily Billed orders ( Retail )', 'Daily Billed orders (Inter company )', 'Daily Billed orders (Total)', 'Water Charges/Order', 'Last Mile Cost/Order', 'Mid Mile Cost/Order', 'Water Charges']]
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
