@@ -1,0 +1,30 @@
+Dist,HeadCount,Serviceability,dt,kpi,Dist Id,ops_start_hour,ops_end_hour,start_hour,end_hour,working Days,duration,shift_factor,ManPower
+AK Pharma - Belgaum,1,100.0,November-22,Dispatch,36834,09:30:00,20:00:00,10,20,26,10,1.25,1.25
+Aayush Pharma - Guwahati,1,100.0,November-22,Dispatch,36724,08:30:00,20:00:00,9,20,26,11,1.375,1.375
+Aryan Wellness,8,91.25,November-22,Dispatch,64,08:00:00,07:59:00,0,23,30,23,2.875,23.0
+Ashirwad Distributors - Ahmedabad,1,100.0,November-22,Dispatch,34111,09:00:00,18:00:00,9,18,26,9,1.125,1.125
+Ashirwad Distributors - Nagpur,1,95.83333333333334,November-22,Dispatch,34553,09:30:00,20:30:00,10,21,26,11,1.375,1.375
+Ashirwad Distributors - Raipur,1,94.44444444444444,November-22,Dispatch,33794,09:15:00,20:00:00,9,20,26,11,1.375,1.375
+Ashirwad Distributors - Surat,1,100.0,November-22,Dispatch,33916,08:30:00,19:00:00,9,19,27,10,1.25,1.25
+Balaji Pharmatech - Vizag,1,100.0,November-22,Dispatch,42596,09:30:00,18:30:00,10,19,26,9,1.125,1.125
+DCA - Indore,1,98.2051282051282,November-22,Dispatch,30410,08:30:00,20:30:00,9,21,26,12,1.5,1.5
+DCA - Patna,1,99.76190476190476,November-22,Dispatch,32186,07:30:00,21:00:00,8,21,26,13,1.625,1.625
+DRK Enterprises,0,100.0,November-22,Dispatch,5430,09:00:00,21:00:00,9,21,28,12,1.5,0.0
+Desai,3,94.30555555555556,November-22,Dispatch,6,09:00:00,08:59:00,0,23,30,23,2.875,8.625
+EC Agencies Goa,0,99.74358974358975,November-22,Dispatch,34498,08:45:00,20:30:00,9,21,27,12,1.5,0.0
+Eastern,9,91.66666666666666,November-22,Dispatch,5,09:00:00,08:59:00,0,23,30,23,2.875,25.875
+Ekdanta Pharmatech - Aurangabad,1,99.69696969696969,November-22,Dispatch,42592,09:00:00,19:00:00,9,19,26,10,1.25,1.25
+Ekdanta Pharmatech - Nashik,1,100.0,November-22,Dispatch,43090,09:00:00,19:00:00,9,19,26,10,1.25,1.25
+Kamal Health Distributors,0,98.44444444444444,November-22,Dispatch,34237,08:30:00,23:00:00,9,23,26,14,1.75,0.0
+Mayapuri,6,96.11111111111111,November-22,Dispatch,70,09:00:00,20:00:00,9,20,30,11,1.375,8.25
+Medicos,1,97.43589743589743,November-22,Dispatch,5050,09:30:00,22:00:00,10,22,26,12,1.5,1.5
+Muthu-MW,6,91.11111111111111,November-22,Dispatch,914,09:00:00,08:59:00,0,23,30,23,2.875,17.25
+Patpadganj,2,98.19444444444444,November-22,Dispatch,71,9:30 to 19:00,20:30 to 05:00,0,23,23,23,2.875,5.75
+Pharmeasy Wholesale - Varanasi,1,100.0,November-22,Dispatch,37294,09:30:00,19:00:00,10,19,30,9,1.125,1.125
+Sachdeva Medicals,2,92.96296296296296,November-22,Dispatch,32211,09:30:00,06:00:00,10,18,30,8,1.0,2.0
+Sachdeva Prayagraj,1,100.0,November-22,Dispatch,35266,09:30:00,19:00:00,10,18,26,8,1.0,1.0
+Shreeji Distributors - Hyderabad,1,94.72222222222221,November-22,Dispatch,42756,,,0,23,25,23,2.875,2.875
+Simba,10,90.83333333333333,November-22,Dispatch,2,09:00:00,08:59:00,0,23,30,23,2.875,28.75
+Sri Alagu Pharma,1,93.88888888888889,November-22,Dispatch,36552,09:00:00,20:00:00,9,20,28,11,1.375,1.375
+Varma Medicals,1,99.86111111111111,November-22,Dispatch,31812,,,0,23,25,23,2.875,2.875
+Venkatesha,0,100.0,November-22,Dispatch,344,09:00:00,1900-01-01 00:30:00,9,23,26,14,1.75,0.0
