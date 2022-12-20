@@ -166,8 +166,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 
 CRONJOBS = [
     ('00 05 1 * *', 'vyuha.views.run_distance_matrix_cron', '>> /tmp/scheduled_job.log'),
-    ('00 05 10 * *', 'vyuha.cron.run_mis_consolidater', '>> /tmp/scheduled_job.log')
-    ('00 08 10 * *', 'vyuha.cron.run_mis_sheeter', '>> /tmp/scheduled_job.log'),
+    ('00 05 10 * *', 'vyuha.cron.run_mis_consolidater', '>> /tmp/scheduled_job.log'),
+    ('00 08 10 * *', 'vyuha.cron.run_mis_sheeter', '>> /tmp/scheduled_job.log')
 ]
 
 
