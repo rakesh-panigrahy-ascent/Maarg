@@ -61,15 +61,17 @@ def stop_ors(request):
    return JsonResponse(resp)
 
 def start_maarg(request):
-   unit_asset_id = request.POST['unit_asset_id']
-   asset_id, unit_name = unit_asset_id.split()[0], ' '.join(unit_asset_id.split()[1:])
-   print(asset_id)
+   unit_name = request.POST['unit']
+   auto_mode = 0
+   if request.POST['auto_cluster'] == 'true':
+      auto_mode = 1
+
    print(unit_name)
 
    if PROD == True:
-      result = start_cluster_process.delay(unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 10)
+      result = start_cluster_process.delay(unit_name=unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 30, pincode=[], km_per_hour=20, serving_time=5, time_benchmark=210, auto_mode = auto_mode)
    else:
-      result = start_cluster_process(unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 10)
+      result = start_cluster_process(unit_name=unit_name, sales_value_benchmark=45000, distance_benchmark=30000, max_clusters = 30, pincode=[], km_per_hour=20, serving_time=5, time_benchmark=210, auto_mode = auto_mode)
    
    resp = {'data':'Starting Clustering For {}'.format(unit_name)}
    return JsonResponse(resp)
@@ -151,8 +153,10 @@ def start_kmeans(request):
 def generate_sales_data(request):
    unit_asset_id = request.POST['unit_asset_id']
    asset_id, unit_name = unit_asset_id.split()[0], ' '.join(unit_asset_id.split()[1:])
-   start_date = datetime.today().date() - timedelta(days=31)
-   end_date = datetime.today().date() - timedelta(days=1)
+
+   previous_month_date = datetime.today() - relativedelta(months=1)
+   start_date = current_date = datetime(previous_month_date.year, previous_month_date.month, 1).date()
+   end_date = start_date + relativedelta(months=1) - timedelta(days=1)
 
    get_cluster_sales_data(str(start_date), str(end_date), asset_id, unit_name)
 
@@ -251,6 +255,8 @@ def calculate_distance(request):
    coordinate_file = coordinate_file[coordinate_file['Distributor Name'] == unit_name]
    coordinate_file = coordinate_file.loc[:, ['distributor_id', 'Distributor Name', 'Customer Code', 'Customer Name', 'latitude', 'longitude']]
    print(coordinate_file)
+   if os.path.exists('vyuha/distance_matrix/input_files/') == False:
+      os.makedirs('vyuha/distance_matrix/input_files/')
    coordinate_file.to_csv(output_file_path, index=False)
 
    # handle_uploaded_file(request.FILES['file'], output_filename)
@@ -417,6 +423,8 @@ def get_capacity_data(request):
    df = pd.read_sql(t, conn)
    input_dir = 'vyuha/others/files/input_files/'
    input_file = input_dir+'Capacity Planning.csv'
+   if os.path.exists('vyuha/others/files/input_files/') == False:
+      os.makedirs('vyuha/others/files/input_files/')
    df.to_csv(input_file, index=False)
    resp = {'data':'Imported Data!'}
    return JsonResponse(resp)

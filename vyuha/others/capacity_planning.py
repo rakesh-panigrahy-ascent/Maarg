@@ -172,6 +172,8 @@ class CapacityPlanning:
     def export_daily_summary(self):
         output_dir = 'vyuha/others/files/output_files/'
         output_file = output_dir + 'Capacity Planning Daily Summary.csv'
+        if os.path.exists('vyuha/others/files/output_files/') == False:
+            os.makedirs('vyuha/others/files/output_files/')
         self.daily_master_summary.to_csv(output_file, index=False)
 
     def export_weekday_summary(self):
@@ -179,6 +181,8 @@ class CapacityPlanning:
         output_file = output_dir + 'Capacity Planning Weekday Summary.csv'
         daily_summary = self.daily_master_summary
         desc = daily_summary.groupby(['Distributor', 'WeekDay']).describe().reset_index()
+        if os.path.exists('vyuha/others/files/output_files/') == False:
+            os.makedirs('vyuha/others/files/output_files/')
         desc.to_csv(output_file, index=False)
 
     def export_hourly_data(self):
@@ -187,6 +191,8 @@ class CapacityPlanning:
         main_data = pd.DataFrame()
         for unit in self.dist_data.keys():
             main_data = pd.concat([main_data, self.dist_data[unit]])
+        if os.path.exists('vyuha/others/files/output_files/') == False:
+            os.makedirs('vyuha/others/files/output_files/')
         main_data.to_csv(output_file, index=False)
 
     def export_roaster_data(self):
@@ -244,6 +250,9 @@ class CapacityPlanning:
             output_file = output_dir + '{} - Capacity Planning {} Serviceability.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
         else:
             output_file = output_dir + '{} - {} - Roaster {} Serviceability.csv'.format(day, self.start_date.strftime('%B-%y'), self.kpi)
+        
+        if os.path.exists(output_dir) == False:
+            os.makedirs(output_dir)
 
         summary.to_csv(output_file, index=False)
         return self.export_serviceability_summary(summary, self.serviceability, day)
@@ -261,6 +270,10 @@ class CapacityPlanning:
         # data['duration'] = data['end_hour'] - data['start_hour']
         data['ManPower'] = data['shift_factor']*data['HeadCount']
         output_dir = 'vyuha/others/files/output_files/'
+        
+        if os.path.exists('vyuha/others/files/output_files/') == False:
+            os.makedirs('vyuha/others/files/output_files/')
+
         if day == '':
             output_file = output_dir + '{} - {} - Service Level Result.csv'.format(self.start_date.strftime('%B-%y'), self.kpi)
             data.to_csv(output_file, index=False)
@@ -333,6 +346,8 @@ class CapacityPlanning:
         final_df = final_df[(final_df['Date'] >= start_date) & (final_df['Date'] <= end_date)]
         final_df = final_df.pivot_table(index=['Date', 'Department', 'Dist', 'KPI', 'MIS Dept'], columns=['Measure Names'], values='Measure Values').reset_index()
         final_df['Ideal Cost'] = final_df['Ideal Head Count'] * final_df['Ideal Avg Salary']
+        if os.path.exists('vyuha/others/files/output_files/') == False:
+            os.makedirs('vyuha/others/files/output_files/')
         final_df.to_csv('vyuha/others/files/output_files/Output.csv', index=False)
         if self.report_prefix == None:
             sq.dftoSheetsfast(driver,sheeter,final_df,sp_nam_id='1vUw629ei6icmRjiZoL6zgcFKRhFcxBBtKUeusqcc7Vg',sh_name='Sheet1')

@@ -13,8 +13,16 @@ class Cluster:
         sales_path = 'vyuha/distance_matrix/output_files/sales/sales.csv'
         distance_matrix_path = 'vyuha/distance_matrix/output_files/{}.csv'.format(hub)
         self.distance_matrix = pd.read_csv(distance_matrix_path)
+        print('Distance matrix data found !')
         self.sales = pd.read_csv(sales_path)
+        print('Sales data found !')
 
+        previous_month_date = datetime.today() - relativedelta(months=1)
+        start_date = current_date = datetime(previous_month_date.year, previous_month_date.month, 1).date()
+        today = start_date + relativedelta(months=1) - timedelta(days=1)
+
+        print('Start Date: {}'.format(start_date))
+        print('End Date: {}'.format(today))
         
         if len(pincode) != 0:
             print('HERE')
@@ -31,7 +39,8 @@ class Cluster:
         self.sales_value_benchmark = sales_value_benchmark
         self.distance_benchmark = distance_benchmark
         self.max_clusters = max_clusters
-        self.vl = Validate(hub, sales_value_benchmark, distance_benchmark, km_per_hour, serving_time, time_benchmark)
+        self.vl = Validate(hub = hub, previous_month_date = previous_month_date,start_date = start_date, current_date = current_date, today = today, sales_value_benchmark = sales_value_benchmark, distance_benchmark = distance_benchmark, km_per_hour=km_per_hour, serving_time=serving_time, time_benchmark=time_benchmark)
+        # self.vl = Validate(hub, sales_value_benchmark, distance_benchmark, km_per_hour, serving_time, time_benchmark)
         
         
         self.distance_matrix['to_customer_code'] = self.distance_matrix['to_customer_code'].astype('str')

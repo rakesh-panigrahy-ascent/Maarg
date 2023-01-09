@@ -152,6 +152,14 @@ class distance_matrix:
         
         print('Processing masterlist data...')
         joblib.dump(master_list, 'vyuha/distance_matrix/output_files/objects/master_list_{}'.format(output_file_name))
+        joblib.dump(df, 'vyuha/distance_matrix/output_files/objects/df_{}'.format(output_file_name))
+        
+        # return self.export_distance_object_to_csv(df, output_file_name, master_list)
+
+    def export_distance_object_to_csv(self, output_file_name):
+        master_list = joblib.load('vyuha/distance_matrix/output_files/objects/master_list_{}'.format(output_file_name))
+        df = joblib.load('vyuha/distance_matrix/output_files/objects/df_{}'.format(output_file_name))
+
         source = []
         dest = []
         distance = []
@@ -194,8 +202,13 @@ class distance_matrix:
             distance_matrix_df_cp = distance_matrix_df_cp.merge(df_c, on=['d_lat','d_lon'], how='left')
             distance_matrix_df_cp.rename(columns={'Customer Code':'to_customer_code'}, inplace=True)
             distance_matrix_df_cp.drop(columns=['distributor_id_x', 'Distributor Name_x', 'Customer Name_x', 'Customer Name_y', 'distributor_id_y', 'Distributor Name_y'], inplace=True)
+            distance_matrix_df_cp.drop_duplicates(subset=['from_customer_code', 'to_customer_code'], inplace=True)
+            distance_matrix_df_cp = distance_matrix_df_cp[distance_matrix_df_cp['from_customer_code'].notna()]
+            distance_matrix_df_cp = distance_matrix_df_cp[distance_matrix_df_cp['to_customer_code'].notna()]
             # distance_matrix_df_cp
             output_file_name += '_distance_matrix.csv'
+            if os.path.exists('vyuha/distance_matrix/output_files/') == False:
+                os.makedirs('vyuha/distance_matrix/output_files/')
             output_file = 'vyuha/distance_matrix/output_files/{}'.format(output_file_name)
             distance_matrix_df_cp.to_csv(output_file, index=False)
         except Exception as e:
@@ -235,6 +248,8 @@ class distance_matrix:
         coordinate_file = coordinate_file[coordinate_file['Distributor Name'] == unit_name]
         coordinate_file = coordinate_file.loc[:, ['distributor_id', 'Distributor Name', 'Customer Code', 'Customer Name', 'latitude', 'longitude']]
         print(coordinate_file)
+        if os.path.exists('vyuha/distance_matrix/input_files/') == False:
+                os.makedirs('vyuha/distance_matrix/input_files/')
         coordinate_file.to_csv(output_file_path, index=False)
         
         df = coordinate_file.to_json()
