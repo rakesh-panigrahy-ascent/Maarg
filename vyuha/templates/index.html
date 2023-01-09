@@ -224,16 +224,28 @@ $(document).ready(function(){
             var maarg_max_clusters_benchmark = $('#maarg_max_clusters_benchmark').val()
             var maarg_sales_benchmark = $('#maarg_sales_benchmark').val()
             var unit = $('#unit_name_asset_id').val()
+            var auto_cluster = $('#auto_cluster').prop('checked')
 
-            if (maarg_distance_benchmark == '' || maarg_max_clusters_benchmark == '' || unit == 'Select' || unit == ''|| maarg_sales_benchmark == ''){
-                alert('Please enter the hyperparameters!');
-                return false
+            if (auto_cluster == false){
+                if (maarg_distance_benchmark == '' || maarg_max_clusters_benchmark == '' || unit == 'Select' || unit == ''|| maarg_sales_benchmark == ''){
+                    alert('Please enter the hyperparameters!');
+                    return false
+                }
+            }else{
+                maarg_distance_benchmark = 0
+                maarg_max_clusters_benchmark = 0
+                unit = ''
+                maarg_sales_benchmark = 0
             }
+
+            //console.log(auto_cluster)
+            //return 0
     
             form_data.append('maarg_distance_benchmark', maarg_distance_benchmark)
             form_data.append('maarg_max_clusters_benchmark', maarg_max_clusters_benchmark)
             form_data.append('unit', unit)
             form_data.append('maarg_sales_benchmark', maarg_sales_benchmark)
+            form_data.append('auto_cluster', auto_cluster)
             
             $.ajax({
                 url: 'start_maarg',

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 class Validate:
-    def __init__(self, hub, sales_value_benchmark = 40000, distance_benchmark = 30000, km_per_hour=20, serving_time=5, time_benchmark=210):
+    def __init__(self, hub, previous_month_date,start_date, current_date, today, sales_value_benchmark = 40000, distance_benchmark = 30000, km_per_hour=20, serving_time=5, time_benchmark=210):
         distance_matrix_path = 'vyuha/distance_matrix/output_files/{}.csv'.format(hub)
         sales_path = 'vyuha/distance_matrix/output_files/sales/sales.csv'
         distance_matrix = pd.read_csv(distance_matrix_path)
@@ -27,13 +27,19 @@ class Validate:
         self.sales_value_benchmark = sales_value_benchmark
         self.distance_benchmark = distance_benchmark
 
+        self.previous_month_date = previous_month_date
+        self.start_date = start_date
+        self.current_date = current_date
+        self.today = today
+
     def validate(self, customers = []):
         hub = customers[0]
         print('Hub:', hub)
         self.customers = customers
-        previous_month_date = datetime.today() - relativedelta(months=-1)
-        start_date = current_date = datetime(previous_month_date.year, previous_month_date.month, 1).date()
-        today = start_date + relativedelta(months=1) - timedelta(days=1)
+        previous_month_date = self.previous_month_date
+        start_date = self.start_date
+        current_date = self.current_date
+        today = self.today
         counter = 0
         while current_date <= today:
             shift1_time_case = 'Fail'
@@ -93,14 +99,14 @@ class Validate:
         
         total_sales = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date)].amount.sum()
         
-        shift1_sales = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['Shift'] == 'Shift 1')].amount.sum()
-        shift2_sales = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['Shift'] == 'Shift 2')].amount.sum()
+        shift1_sales = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['shift'] == 'Shift 1')].amount.sum()
+        shift2_sales = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['shift'] == 'Shift 2')].amount.sum()
         
-        shift1_customers_served_count = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['Shift'] == 'Shift 1')].acno.nunique()
-        shift1_customers_served = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['Shift'] == 'Shift 1')].acno.unique()
+        shift1_customers_served_count = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['shift'] == 'Shift 1')].acno.nunique()
+        shift1_customers_served = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['shift'] == 'Shift 1')].acno.unique()
         
-        shift2_customers_served_count = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['Shift'] == 'Shift 2')].acno.nunique()
-        shift2_customers_served = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['Shift'] == 'Shift 2')].acno.unique()
+        shift2_customers_served_count = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['shift'] == 'Shift 2')].acno.nunique()
+        shift2_customers_served = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date) & (sales_data['shift'] == 'Shift 2')].acno.unique()
         
         customers_served_count = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date)].acno.nunique()
         customers_served = sales_data[(sales_data['acno'].isin(customers)) & (sales_data['tagdt'].dt.date == current_date)].acno.unique()
