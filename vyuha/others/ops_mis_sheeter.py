@@ -13,18 +13,20 @@ import json
 from xlsxwriter.utility import xl_rowcol_to_cell
 from vyuha.mailer.mailer import *
 import numpy as np
+from vyuha.others.ops_mis_config import *
 
 driver,sheeter = sq.apiconnect()
 
 def main():
     mis_pools_data = sq.sheetsToDf(sheeter,spreadsheet_id='15D-4rRRzzMxcuUsOXk_Rp8Gs4_smLXk5PrpTPlwvv6Y',sh_name='Unit - Pool')
+    mis_pools_data = mis_pools_data[mis_pools_data['active']=='1']
     mis_kpis = sq.sheetsToDf(sheeter,spreadsheet_id='15D-4rRRzzMxcuUsOXk_Rp8Gs4_smLXk5PrpTPlwvv6Y',sh_name='temp')
     
     #### TO ADD Header KPI values #####
     kpis_df = pd.read_csv(os.path.join(os.path.dirname(__file__))+'/mis/output_files/Merged Calculated Sheet.csv')
     unit_name_df = pd.DataFrame(mis_pools_data)
     group_list = unit_name_df.iloc[:,:2].groupby('Pool')['Distributor Name'].apply(list)
-
+    print(group_list)
 
     ############# END KPI Values ###############
 
@@ -36,7 +38,9 @@ def main():
     # Add a bold format to use to highlight cells.
     bold = workbook.add_format({'bold': True})
     italic = workbook.add_format({'italic': True})
-
+    print('pools', pools.values)
+    print('Consolidateed')
+    print(kpis_df.head())
     for pool in pools.values:
         #Zone wise ditributors
         zone_wise_distributors = mis_pools_data[mis_pools_data['Pool']==pool[0]]['Distributor Name']
@@ -45,117 +49,13 @@ def main():
         unit_list = group_list[pool[0]]
         all_kpis_df = kpis_df[kpis_df['unit_name'].isin(unit_list)]
         all_kpis_df = all_kpis_df.groupby('month').sum()
-
-        # Calculate kpi headers# 
-        all_kpis_df['Avg Order Value (Gross)'] = all_kpis_df['Gross Sales (W/o Gst)']*1000000/all_kpis_df['Billed orders (Total)']
-        all_kpis_df['Avg Order Value (retail)'] = all_kpis_df['Net Revenue (after discuount W/o Gst)']*1000000/all_kpis_df['Billed orders ( Retail )']
-        all_kpis_df['Sale Return Percentage'] = all_kpis_df['Sale Return Value from customer'] / all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Expiry Return Percentage'] = all_kpis_df['Expiry Return Value from customer'] / all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Percentage of Non-moving item'] = all_kpis_df['Value of Non-moving item'] / all_kpis_df['Inventory value - PTS/EPR (15th of the month)']
-
-        all_kpis_df['Total Operating Cost as a % of Net Revenue (before THEA reimbursement Deduction)'] = all_kpis_df['Total Operating Cost (before THEA reimbursement Deduction)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.A Salaries & Wages as a % of Net Revenue'] = all_kpis_df['1. Salaries & Wages']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Ops Salaries & Wages as a % of Net Revenue'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.b Delivery Salary % of Net Revenue'] = all_kpis_df['Total Salary--Delivery']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.i Inward % of Net Revenue'] = all_kpis_df['Total Salary--Inward']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.ii Store cost per order % of Net Revenue'] = all_kpis_df['Total Salary--Store']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.iii Checking % of Net Revenue'] = all_kpis_df['Total Salary--Checking']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.iv Dispatch % of Net Revenue'] = all_kpis_df['Total Salary--Dispatch']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.v Audit and refilling % of Net Revenue'] = all_kpis_df['Total Salary--Audit & Refilling']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.vi Expiry % of Net Revenue'] = all_kpis_df['Total Salary--Expiry']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.vii Sales return % of Net Revenue'] = all_kpis_df['Total Salary--Sales Return']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        # all_kpis_df['1.a.viii Overall Operations % of Net Revenue'] = all_kpis_df['Total Salary--Overall Operation']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.d Admin % of Net Revenue'] = all_kpis_df['Total Salary--Admin']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.e Finance & Accounts % of Net Revenue'] = all_kpis_df['Total Salary--Finance & Accounts']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.f Purchase % of Net Revenue'] = all_kpis_df['Total Salary--Purchase']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.g Sales % of Net Revenue'] = all_kpis_df['Total Salary--Sales']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.h IT % of Net Revenue'] = all_kpis_df['Total Salary--IT']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.i HR % of Net Revenue'] = all_kpis_df['Total Salary--HR']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.j Data Analyst % of Net Revenue'] = all_kpis_df['Total Salary--Data analyst']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['1.k Overall Non - Operations % of Net Revenue'] = all_kpis_df['Total Salary--Overall Non - Ops']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Total Last mile (Actual) as a % of Net Revenue'] = all_kpis_df['Total Last mile (Actual)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Mid mile (MIS) as a % of Net Revenue'] = all_kpis_df['Mid mile (MIS)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Last Mile (MIS) as a % of Net Revenue'] = all_kpis_df['Last Mile (MIS)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Total Last Mile (MIS + Inhouse Delivery) as a % of Net Revenue'] = (all_kpis_df['Last Mile (MIS)'] + all_kpis_df['Inhouse Bikers Cost'])/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Mid mile (Actual) as a % of Net Revenue'] = all_kpis_df['Mid mile (Actual)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['3.A. Packaging Cost as a % of Net Revenue'] = all_kpis_df['3. Packaging Cost']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['3.a Polybag cost Cost as a % of Net Revenue'] = all_kpis_df['3.a Polybag cost']/all_kpis_df['Billed orders (Total)']
-        all_kpis_df['3.b other packing cost Cost as a % of Net Revenue'] = all_kpis_df['3.b other packing cost']/all_kpis_df['Billed orders (Total)']
-        all_kpis_df['4.A. Electricity as a % of Net Revenue'] = all_kpis_df['4. Electricity']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['5.A. Telephone & Internet as a % of Net Revenue'] = all_kpis_df['5. Telephone & Internet']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['6.A. Commission expenses as a % of Net Revenue'] = all_kpis_df['6. Commission expenses']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['7.A. Warehouse Rent as a % of Net Revenue'] = all_kpis_df['7. Warehouse Rent']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['8.A. Cash Discounts to Retailers as a % of Net Revenue'] = all_kpis_df['8. Cash Discounts to Retailers']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['9.A. Other Operating Expenses as a % of Net Revenue'] = all_kpis_df['9. Other Operating Expenses']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['10.A. Other income as a % of Net Revenue'] = all_kpis_df['10. Other income']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['THEA Reimbursemnt as a % of Net Revenue'] = all_kpis_df['THEA reimbursement']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-        all_kpis_df['Total Operating Cost as a % of Net Revenue (After THEA reimbursement Deduction)'] = all_kpis_df['Total Operating Cost (after THEA reimbursement Deduction)']/all_kpis_df['Net Revenue (after discuount W/o Gst)']
-
-        all_kpis_df['Cost per man per month Total Operations'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Present Head Count Ops']*1000000
-        all_kpis_df['Cost per man per month Inward'] = all_kpis_df['Total Salary--Inward'] / all_kpis_df['Present Head Count--Inward']*1000000
-        all_kpis_df['Cost per man per month Store'] = all_kpis_df['Total Salary--Store'] / all_kpis_df['Present Head Count--Store']*1000000
-        all_kpis_df['Cost per man per month Checking'] = all_kpis_df['Total Salary--Checking'] / all_kpis_df['Present Head Count--Checking']*1000000
-        all_kpis_df['Cost per man per month Dispatch'] = all_kpis_df['Total Salary--Dispatch'] / all_kpis_df['Present Head Count--Dispatch']*1000000
-        all_kpis_df['Cost per man per month Audit and refilling'] = all_kpis_df['Total Salary--Audit & Refilling'] / all_kpis_df['Present Head Count--Audit & Refilling']*1000000
-        all_kpis_df['Cost per man per month Expiry'] = all_kpis_df['Total Salary--Expiry'] / all_kpis_df['Present Head Count--Expiry']*1000000
-        all_kpis_df['Cost per man per month Sales return'] = all_kpis_df['Total Salary--Sales Return'] / all_kpis_df['Present Head Count--Sales Return']*1000000
-        all_kpis_df['Cost per man per month Overall operations'] = all_kpis_df['Total Salary--Overall Operation'] / all_kpis_df['Present Head Count--Overall Operation']*1000000
-        # all_kpis_df['Cost per man per month Total Operations'] = all_kpis_df['Cost per man per month Inward'] + all_kpis_df['Cost per man per month Store'] + all_kpis_df['Cost per man per month Checking'] + all_kpis_df['Cost per man per month Dispatch'] + all_kpis_df['Cost per man per month Audit and refilling'] + all_kpis_df['Cost per man per month Expiry'] + all_kpis_df['Cost per man per month Sales return'] + all_kpis_df['Cost per man per month Overall operations']
-        all_kpis_df['Cost per man per month Delivery'] = all_kpis_df['Total Salary--Delivery'] / all_kpis_df['Present Head Count--Delivery']*1000000
-        all_kpis_df['Cost per man per month Admin'] = all_kpis_df['Total Salary--Admin'] / all_kpis_df['Present Head Count--Admin']*1000000
-        all_kpis_df['Cost per man per month Finance & Accounts'] = all_kpis_df['Total Salary--Finance & Accounts'] / all_kpis_df['Present Head Count--Finance & Accounts']*1000000
-        all_kpis_df['Cost per man per month Purchase'] = all_kpis_df['Total Salary--Purchase'] / all_kpis_df['Present Head Count--Purchase']*1000000
-        all_kpis_df['Cost per man per month Sales'] = all_kpis_df['Total Salary--Sales'] / all_kpis_df['Present Head Count--Sales']*1000000
-        all_kpis_df['Cost per man per month IT'] = all_kpis_df['Total Salary--IT'] / all_kpis_df['Present Head Count--IT']*1000000
-        all_kpis_df['Cost per man per month HR'] = all_kpis_df['Total Salary--HR'] / all_kpis_df['Present Head Count--HR']*1000000
-        all_kpis_df['Cost per man per month Data Analyst'] = all_kpis_df['Total Salary--Data analyst'] / all_kpis_df['Present Head Count--Data analyst']*1000000
-        all_kpis_df['Cost per man per month Overall Non-Operations'] = all_kpis_df['Total Salary--Overall Non - Ops'] / all_kpis_df['Present Head Count--Overall Non - Ops']*1000000
-        all_kpis_df['Inward Productivity (Inward Strips Per Manday)'] = all_kpis_df['Inward Strips']/all_kpis_df['Worked Mandays--Inward']
-        all_kpis_df['Store Productivity (Billed line Items per Manday)'] = all_kpis_df['Billed line items (Total)']/all_kpis_df['Worked Mandays--Store']
-        all_kpis_df['Checking Productivity (Billed Strips Per Manday)'] = all_kpis_df['Billed Strips (Total)']/all_kpis_df['Worked Mandays--Checking']
-        all_kpis_df['Dispatch Productivity (Billed Orders per Manday)'] = all_kpis_df['Billed orders (Total)']/all_kpis_df['Worked Mandays--Dispatch']
-        all_kpis_df['Audit and refilling Productivity (Godown to Store Strips per Manday)'] = all_kpis_df['Godown to store Strips']/all_kpis_df['Worked Mandays--Audit & Refilling']
-        all_kpis_df['Expiry Productivity (Expiry Return Strips Per Manday)'] = all_kpis_df['Expiry Return Strips']/all_kpis_df['Worked Mandays--Expiry']
-        all_kpis_df['Sales return Productivity ( Sales Return Strips Per Manday)'] = all_kpis_df['Sales Return Strips']/all_kpis_df['Worked Mandays--Sales Return']
-        all_kpis_df['Purchase Productivity ( Inward Value per Manday)'] = all_kpis_df['Inward value ( PTS/EPR)']/all_kpis_df['Worked Mandays--Purchase']
-        all_kpis_df['Sales Productivity (Net Revenue Per Manday)'] = all_kpis_df['Net Revenue (after discuount W/o Gst)']/all_kpis_df['Worked Mandays--Sales']
-        all_kpis_df['Inventory per sqft'] = all_kpis_df['Inventory value - PTS/EPR (15th of the month)']/all_kpis_df['Warehouse area']
-        all_kpis_df['Net Revenue per sqft'] = all_kpis_df['Net Revenue (after discuount W/o Gst)'] * 1000000/all_kpis_df['Warehouse area']
-
-        all_kpis_df['Cost Per Biker Per Month'] = (all_kpis_df['Biker'] + (all_kpis_df['Van'])*3) / all_kpis_df['Total Biker headcount']*1000000
-
-        all_kpis_df['1. Salaries & Wages cost per order'] = all_kpis_df['1. Salaries & Wages']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.i Inward cost per order'] = all_kpis_df['Total Salary--Inward']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.ii Store cost per order'] = all_kpis_df['Total Salary--Store']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.iii Checking cost per order'] = all_kpis_df['Total Salary--Checking']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.iv Dispatch cost per order'] = all_kpis_df['Total Salary--Dispatch']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.v Audit and refilling cost per order'] = all_kpis_df['Total Salary--Audit & Refilling']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.vi Expiry cost per order'] = all_kpis_df['Total Salary--Expiry']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.vii Sales return cost per order'] = all_kpis_df['Total Salary--Sales Return']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.a.viii Overall Operations cost per order'] = all_kpis_df['Total Salary--Overall Operation']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.b Delivery Salary cost per order'] = all_kpis_df['Total Salary--Delivery']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.d Admin cost per order'] = all_kpis_df['Total Salary--Admin']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.e Finance & Accounts cost per order'] = all_kpis_df['Total Salary--Finance & Accounts']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.f Purchase cost per order'] = all_kpis_df['Total Salary--Purchase']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.g Sales cost per order'] = all_kpis_df['Total Salary--Sales']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.h IT cost per order'] = all_kpis_df['Total Salary--IT']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.i HR cost per order'] = all_kpis_df['Total Salary--HR']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.j Data Analyst cost per order'] = all_kpis_df['Total Salary--Data analyst']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['1.k Overall Non - Operations cost per order'] = all_kpis_df['Total Salary--Overall Non - Ops']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['3. Packaging Cost per order'] = all_kpis_df['3. Packaging Cost']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['3.a Polybag cost cost per order'] = all_kpis_df['3.a Polybag cost']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['3.b other packing cost cost per order'] = all_kpis_df['3.b other packing cost']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['4. Electricity per order'] = all_kpis_df['4. Electricity']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['5. Telephone & Internet per order'] = all_kpis_df['5. Telephone & Internet']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['6. Commission expenses per order'] = all_kpis_df['6. Commission expenses']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['7. Warehouse Rent per order'] = all_kpis_df['7. Warehouse Rent']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['8. Cash Discounts to Retailers per order'] = all_kpis_df['8. Cash Discounts to Retailers']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['9. Other Operating Expenses per order'] = all_kpis_df['9. Other Operating Expenses']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['10. Other income per order'] = all_kpis_df['10. Other income']/all_kpis_df['Billed orders (Total)']*1000000
-        all_kpis_df['THEA reimbursement per order'] = all_kpis_df['THEA reimbursement']/all_kpis_df['Billed orders (Total)']*1000000
-
-        all_kpis_df['Salary and wages cost per order'] = all_kpis_df['Ops Salaries & Wages']/all_kpis_df['Billed orders (Total)']*1000000
-
+        mis_config = MIS_Config()
+        all_kpis_df = mis_config.calculate(all_kpis_df=all_kpis_df)
+        all_kpis_df.to_csv('all_kpis_df_{}.csv'.format(pool[0]), index=False)
+        print('all_kpis_df')
+        print(all_kpis_df)
+        print('Exported!')
+        
 
         ####### End KPI headers #########
 
